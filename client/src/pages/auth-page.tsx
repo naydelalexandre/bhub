@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation, useRoute } from "wouter";
+import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -34,10 +34,8 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState("login");
-  const { user, isLoading, login, register } = useAuth();
+  const { user, loginMutation, registerMutation } = useAuth();
   const [_, navigate] = useLocation();
-  const [loginLoading, setLoginLoading] = useState(false);
-  const [registerLoading, setRegisterLoading] = useState(false);
 
   // Redirect if the user is already logged in
   if (user) {
@@ -46,52 +44,123 @@ export default function AuthPage() {
   }
 
   const handleLogin = async (values: LoginFormValues) => {
-    setLoginLoading(true);
     try {
-      await login(values.username, values.password);
-    } finally {
-      setLoginLoading(false);
+      await loginMutation.mutateAsync({
+        username: values.username,
+        password: values.password
+      });
+      // Navigation will happen automatically on success
+    } catch (error) {
+      // Error is handled in the mutation
     }
   };
 
   const handleRegister = async (values: RegisterFormValues) => {
-    setRegisterLoading(true);
     try {
       const avatarInitials = getInitials(values.name);
-      await register({
+      await registerMutation.mutateAsync({
         ...values,
         avatarInitials
       });
-    } finally {
-      setRegisterLoading(false);
+      // Navigation will happen automatically on success
+    } catch (error) {
+      // Error is handled in the mutation
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-neutral-100">
-      <Card className="w-full max-w-md shadow-lg rounded-xl">
-        <CardContent className="p-8">
-          <div className="text-center mb-6">
-            <h1 className="text-2xl font-semibold text-primary mb-1">Plataforma de Performance</h1>
-            <p className="text-muted-foreground">Gestão de atividades e negociações</p>
+    <div className="min-h-screen flex flex-col md:flex-row">
+      {/* Form Section */}
+      <div className="w-full md:w-1/2 flex items-center justify-center p-8">
+        <div className="w-full max-w-md">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold text-primary mb-2">
+              Plataforma de Performance
+            </h1>
+            <p className="text-muted-foreground">
+              Gestão de atividades e negociações imobiliárias
+            </p>
           </div>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid grid-cols-2 mb-6">
+          <Tabs defaultValue="login" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="login">Login</TabsTrigger>
               <TabsTrigger value="register">Cadastro</TabsTrigger>
             </TabsList>
-
+            
             <TabsContent value="login">
-              <LoginForm isLoading={loginLoading} onSubmit={handleLogin} />
+              <Card>
+                <CardHeader className="space-y-1">
+                  <CardTitle className="text-2xl">Bem-vindo de volta</CardTitle>
+                  <CardDescription>
+                    Entre com suas credenciais para acessar a plataforma
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <LoginForm 
+                    onSubmit={handleLogin} 
+                    isLoading={loginMutation.isPending} 
+                  />
+                </CardContent>
+              </Card>
             </TabsContent>
-
+            
             <TabsContent value="register">
-              <RegisterForm isLoading={registerLoading} onSubmit={handleRegister} />
+              <Card>
+                <CardHeader className="space-y-1">
+                  <CardTitle className="text-2xl">Criar uma conta</CardTitle>
+                  <CardDescription>
+                    Preencha os dados abaixo para se cadastrar
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <RegisterForm 
+                    onSubmit={handleRegister} 
+                    isLoading={registerMutation.isPending} 
+                  />
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
-        </CardContent>
-      </Card>
+          
+          <div className="text-sm text-center text-neutral-500 mt-6">
+            <p>Credenciais de teste:</p>
+            <p>Manager: manager@example.com / password</p>
+            <p>Broker: broker@example.com / password</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Hero Section */}
+      <div className="w-full md:w-1/2 bg-primary p-8 flex items-center justify-center">
+        <div className="text-white max-w-md text-center md:text-left">
+          <h2 className="text-3xl font-bold mb-4">
+            Aumente a performance da sua equipe
+          </h2>
+          <p className="text-lg mb-6">
+            Uma plataforma completa para gestão de atividades, negociações e performance
+            de corretores imobiliários.
+          </p>
+          <ul className="space-y-3 mb-8">
+            <li className="flex items-center">
+              <span className="mr-2">✓</span>
+              <span>Monitore o desempenho da sua equipe</span>
+            </li>
+            <li className="flex items-center">
+              <span className="mr-2">✓</span>
+              <span>Acompanhe negociações em tempo real</span>
+            </li>
+            <li className="flex items-center">
+              <span className="mr-2">✓</span>
+              <span>Gerencie atividades e prazos</span>
+            </li>
+            <li className="flex items-center">
+              <span className="mr-2">✓</span>
+              <span>Comunicação instantânea entre equipes</span>
+            </li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }

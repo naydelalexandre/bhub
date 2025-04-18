@@ -2,12 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import DashboardHeader from "@/components/layouts/dashboard-header";
 import MobileNavigation from "@/components/layouts/mobile-navigation";
+import StatCard from "@/components/dashboard/stat-card";
+import PerformanceChart from "@/components/dashboard/performance-chart";
 import ActivitiesCard from "@/components/dashboard/activities-card";
 import NegotiationsCard from "@/components/dashboard/negotiations-card";
 import NotificationsCard from "@/components/dashboard/notifications-card";
 import ChatContainer from "@/components/chat/chat-container";
 import { WebSocketProvider } from "@/lib/websocket";
 import { Activity, Deal, Notification, Performance } from "@shared/schema";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function BrokerDashboard() {
   const { user } = useAuth();
@@ -41,57 +44,123 @@ export default function BrokerDashboard() {
 
   if (!user) return null;
 
+  // Calculate stats
+  const pendingActivities = activities?.filter(a => a.status !== "completed").length || 0;
+  const totalActivities = activities?.length || 0;
+  const activeDeals = deals?.length || 0;
+  const completedActivities = activities?.filter(a => a.status === "completed").length || 0;
+  const completionRate = totalActivities > 0 ? Math.floor((completedActivities / totalActivities) * 100) : 0;
+
   return (
     <WebSocketProvider userId={user.id}>
-      <div className="min-h-screen bg-neutral-100">
+      <div className="min-h-screen bg-neutral-50">
         <DashboardHeader 
           title="Dashboard do Corretor" 
           user={{
             name: user.name,
-            initials: user.avatarInitials,
+            initials: user.avatarInitials || "BC",
             role: "broker"
           }}
           notificationCount={notifications?.filter(n => !n.read).length || 0}
         />
         
         <main className="container mx-auto px-4 py-6 pb-16 md:pb-6">
-          {/* Broker Stats */}
-          <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-              <div className="mb-4 md:mb-0">
-                <h2 className="text-xl font-semibold text-neutral-400 mb-1">Olá, {user.name.split(' ')[0]}!</h2>
-                <p className="text-neutral-300">
-                  Seu score da semana: <span className="text-secondary font-semibold">{performance?.score || 0}</span>
-                </p>
-              </div>
-              
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center">
-                  <p className="text-xs text-neutral-300 mb-1">Atividades</p>
-                  <div className="flex items-center justify-center">
-                    <span className="material-icons text-primary mr-1">assignment</span>
-                    <span className="font-semibold text-lg">{activities?.length || 0}</span>
-                  </div>
-                </div>
-                
-                <div className="text-center">
-                  <p className="text-xs text-neutral-300 mb-1">Negociações</p>
-                  <div className="flex items-center justify-center">
-                    <span className="material-icons text-accent mr-1">handshake</span>
-                    <span className="font-semibold text-lg">{deals?.length || 0}</span>
-                  </div>
-                </div>
-                
-                <div className="text-center">
-                  <p className="text-xs text-neutral-300 mb-1">Msgs. Novas</p>
-                  <div className="flex items-center justify-center">
-                    <span className="material-icons text-primary mr-1">chat</span>
-                    <span className="font-semibold text-lg">{notifications?.filter(n => n.type === "message" && !n.read).length || 0}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <StatCard 
+              title="Atividades Pendentes"
+              value={pendingActivities}
+              icon="assignment"
+              iconColor="text-accent"
+              progress={{ 
+                current: pendingActivities, 
+                total: totalActivities || 1,
+                color: "bg-accent"
+              }}
+              isLoading={isActivitiesLoading}
+            />
+            
+            <StatCard 
+              title="Taxa de Conclusão"
+              value={completionRate}
+              suffix="%"
+              icon="task_alt"
+              iconColor="text-primary"
+              progress={{ 
+                current: completionRate, 
+                total: 100,
+                color: "bg-primary"
+              }}
+              isLoading={isActivitiesLoading}
+            />
+            
+            <StatCard 
+              title="Performance Score"
+              value={performance?.score || 0}
+              suffix="/100"
+              icon="leaderboard"
+              iconColor="text-secondary"
+              progress={{ 
+                current: performance?.score || 0, 
+                total: 100,
+                color: "bg-secondary"
+              }}
+              isLoading={isPerformanceLoading}
+            />
           </div>
+          
+          {/* Performance Chart */}
+          <div className="mb-6">
+            <PerformanceChart 
+              activities={activities || []}
+              deals={deals || []}
+              isLoading={isActivitiesLoading || isDealsLoading}
+            />
+          </div>
+          
+          {/* Performance Metrics */}
+          <Card className="mb-6">
+            <CardHeader>
+              <CardTitle>Metas e Objetivos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Activity Completion Card */}
+                <div className="bg-primary/5 p-4 rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <p className="text-sm text-neutral-400">Atividades Concluídas</p>
+                    <span className="text-lg font-semibold text-primary">
+                      {completedActivities} de 10
+                    </span>
+                  </div>
+                  <div className="w-full bg-neutral-200 rounded-full h-2 mb-1">
+                    <div 
+                      className="bg-primary h-2 rounded-full" 
+                      style={{ width: `${Math.min(completedActivities, 10) * 10}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-xs text-neutral-300">Meta semanal: 10 atividades</p>
+                </div>
+                
+                {/* Deal Progression Card */}
+                <div className="bg-secondary/5 p-4 rounded-lg">
+                  <div className="flex justify-between items-center mb-2">
+                    <p className="text-sm text-neutral-400">Negociações Ativas</p>
+                    <span className="text-lg font-semibold text-secondary">
+                      {activeDeals} de 5
+                    </span>
+                  </div>
+                  <div className="w-full bg-neutral-200 rounded-full h-2 mb-1">
+                    <div 
+                      className="bg-secondary h-2 rounded-full" 
+                      style={{ width: `${Math.min(activeDeals, 5) * 20}%` }}
+                    ></div>
+                  </div>
+                  <p className="text-xs text-neutral-300">Meta semanal: 5 negociações</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">

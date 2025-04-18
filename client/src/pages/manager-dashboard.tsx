@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import DashboardHeader from "@/components/layouts/dashboard-header";
 import StatCard from "@/components/dashboard/stat-card";
 import PerformanceCard from "@/components/dashboard/performance-card";
+import PerformanceChart from "@/components/dashboard/performance-chart";
 import ActivitiesCard from "@/components/dashboard/activities-card";
 import NegotiationsCard from "@/components/dashboard/negotiations-card";
 import NotificationsCard from "@/components/dashboard/notifications-card";
@@ -43,12 +44,12 @@ export default function ManagerDashboard() {
 
   return (
     <WebSocketProvider userId={user.id}>
-      <div className="min-h-screen bg-neutral-100">
+      <div className="min-h-screen bg-neutral-50">
         <DashboardHeader 
           title="Dashboard do Gestor" 
           user={{
             name: user.name,
-            initials: user.avatarInitials,
+            initials: user.avatarInitials || "MG",
             role: "manager"
           }}
           notificationCount={notifications?.filter(n => !n.read).length || 0}
@@ -64,7 +65,7 @@ export default function ManagerDashboard() {
               iconColor="text-accent"
               progress={{ 
                 current: pendingActivities, 
-                total: totalActivities,
+                total: totalActivities || 1,
                 color: "bg-accent" 
               }}
               isLoading={isActivitiesLoading}
@@ -99,6 +100,15 @@ export default function ManagerDashboard() {
                 trendColor: "text-secondary"
               }}
               isLoading={isPerformancesLoading}
+            />
+          </div>
+          
+          {/* Data Visualization Chart */}
+          <div className="mb-6">
+            <PerformanceChart 
+              activities={activities || []}
+              deals={deals || []}
+              isLoading={isActivitiesLoading || isDealsLoading}
             />
           </div>
           

@@ -1,104 +1,123 @@
-import React, { createContext, ReactNode, useContext, useState } from "react";
-import { InsertUser } from "@shared/schema";
+import { createContext, ReactNode, useContext } from "react";
+import {
+  useQuery,
+  useMutation,
+  UseMutationResult,
+} from "@tanstack/react-query";
+import { InsertUser, User } from "@shared/schema";
+import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
+import { getInitials } from "@/lib/utils";
 
-// Define a simplified User type that matches our expected structure
-type User = {
-  id: number;
-  username: string;
-  password: string;
-  name: string;
-  role: "manager" | "broker";
-  avatarInitials?: string;
-};
-
-// Simplified AuthContextType for now
+// Type for authentication context
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
   error: Error | null;
-  login: (username: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
-  register: (userData: InsertUser) => Promise<void>;
+  loginMutation: UseMutationResult<User, Error, LoginData>;
+  logoutMutation: UseMutationResult<void, Error, void>;
+  registerMutation: UseMutationResult<User, Error, InsertUser>;
 };
 
+// Type for login form data
+type LoginData = Pick<InsertUser, "username" | "password">;
+
 // Create the context with default values
-export const AuthContext = createContext<AuthContextType>({
-  user: null,
-  isLoading: false,
-  error: null,
-  login: async () => {},
-  logout: async () => {},
-  register: async () => {},
-});
+export const AuthContext = createContext<AuthContextType | null>(null);
 
-// Temporary auth provider with mock data to get the UI working
+// Authentication provider component
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const { toast } = useToast();
+  
+  // Query to fetch current user
+  const {
+    data: user,
+    error,
+    isLoading,
+  } = useQuery<User | null, Error>({
+    queryKey: ["/api/user"],
+    queryFn: getQueryFn({ on401: "returnNull" }),
+  });
 
-  const login = async (username: string, password: string) => {
-    setIsLoading(true);
-    try {
-      // For testing UI, create a mock user
-      if (username === "manager@example.com" && password === "password") {
-        setUser({
-          id: 1,
-          username: "manager@example.com",
-          name: "Manager User",
-          role: "manager",
-          password: "", // We never expose the password
-          avatarInitials: "MU"
-        });
-      } else if (username === "broker@example.com" && password === "password") {
-        setUser({
-          id: 2,
-          username: "broker@example.com",
-          name: "Broker User",
-          role: "broker",
-          password: "", // We never expose the password
-          avatarInitials: "BU"
-        });
-      } else {
-        throw new Error("Invalid credentials");
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error("Login failed"));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const logout = async () => {
-    setUser(null);
-  };
-
-  const register = async (userData: InsertUser) => {
-    setIsLoading(true);
-    try {
-      // Simulate register
-      setUser({
-        id: 3,
-        ...userData,
-        password: "", // We never expose the password
-        avatarInitials: userData.avatarInitials || "NU"
+  // Login mutation
+  const loginMutation = useMutation({
+    mutationFn: async (credentials: LoginData) => {
+      const res = await apiRequest("POST", "/api/login", credentials);
+      return await res.json();
+    },
+    onSuccess: (user: User) => {
+      queryClient.setQueryData(["/api/user"], user);
+      toast({
+        title: "Login bem-sucedido",
+        description: `Bem-vindo, ${user.name}!`,
       });
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error("Registration failed"));
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro ao fazer login",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Register mutation
+  const registerMutation = useMutation({
+    mutationFn: async (userData: InsertUser) => {
+      // Add initials if not provided
+      if (!userData.avatarInitials) {
+        userData.avatarInitials = getInitials(userData.name);
+      }
+      
+      const res = await apiRequest("POST", "/api/register", userData);
+      return await res.json();
+    },
+    onSuccess: (user: User) => {
+      queryClient.setQueryData(["/api/user"], user);
+      toast({
+        title: "Registro bem-sucedido",
+        description: "Sua conta foi criada com sucesso",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro ao registrar",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Logout mutation
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("POST", "/api/logout");
+    },
+    onSuccess: () => {
+      queryClient.setQueryData(["/api/user"], null);
+      toast({
+        title: "Logout bem-sucedido",
+        description: "Você foi desconectado com sucesso",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erro ao fazer logout",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   return (
     <AuthContext.Provider
       value={{
-        user,
+        user: user || null,
         isLoading,
         error,
-        login,
-        logout,
-        register
+        loginMutation,
+        logoutMutation,
+        registerMutation,
       }}
     >
       {children}
@@ -106,6 +125,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
+// Hook to use the auth context
 export function useAuth() {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 }
