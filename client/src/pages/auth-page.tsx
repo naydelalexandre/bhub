@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { useAuth } from "@/hooks/use-auth";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -34,37 +33,61 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function AuthPage() {
   const [activeTab, setActiveTab] = useState("login");
-  const { user, loginMutation, registerMutation } = useAuth();
-  const [_, navigate] = useLocation();
-
-  // Redirect if the user is already logged in
-  if (user) {
-    navigate("/");
-    return null;
-  }
+  const [isLoading, setIsLoading] = useState(false);
+  const [, navigate] = useLocation();
 
   const handleLogin = async (values: LoginFormValues) => {
+    setIsLoading(true);
     try {
-      await loginMutation.mutateAsync({
-        username: values.username,
-        password: values.password
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          username: values.username,
+          password: values.password
+        })
       });
-      // Navigation will happen automatically on success
+      
+      if (response.ok) {
+        navigate("/");
+      } else {
+        const error = await response.json();
+        console.error("Login failed:", error);
+      }
     } catch (error) {
-      // Error is handled in the mutation
+      console.error("Login error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleRegister = async (values: RegisterFormValues) => {
+    setIsLoading(true);
     try {
       const avatarInitials = getInitials(values.name);
-      await registerMutation.mutateAsync({
-        ...values,
-        avatarInitials
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ...values,
+          avatarInitials
+        })
       });
-      // Navigation will happen automatically on success
+      
+      if (response.ok) {
+        navigate("/");
+      } else {
+        const error = await response.json();
+        console.error("Registration failed:", error);
+      }
     } catch (error) {
-      // Error is handled in the mutation
+      console.error("Registration error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -99,7 +122,7 @@ export default function AuthPage() {
                 <CardContent>
                   <LoginForm 
                     onSubmit={handleLogin} 
-                    isLoading={loginMutation.isPending} 
+                    isLoading={isLoading} 
                   />
                 </CardContent>
               </Card>
@@ -116,7 +139,7 @@ export default function AuthPage() {
                 <CardContent>
                   <RegisterForm 
                     onSubmit={handleRegister} 
-                    isLoading={registerMutation.isPending} 
+                    isLoading={isLoading} 
                   />
                 </CardContent>
               </Card>
