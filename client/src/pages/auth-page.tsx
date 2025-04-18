@@ -32,23 +32,39 @@ const registerSchema = z.object({
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function AuthPage() {
-  const { loginMutation, registerMutation } = useAuth();
+  const { user, isLoading, loginMutation, registerMutation } = useAuth();
   const [, navigate] = useLocation();
+  
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!isLoading && user) {
+      console.log("User already logged in, redirecting to dashboard", user);
+      navigate(user.role === "manager" ? "/manager" : "/broker");
+    }
+  }, [user, isLoading, navigate]);
 
   // Handle login submission
   const handleLogin = async (values: LoginFormValues) => {
-    loginMutation.mutate({
-      username: values.username,
-      password: values.password
-    }, {
-      onSuccess: (user) => {
-        if (user.role === "manager") {
-          navigate("/manager");
-        } else {
-          navigate("/broker");
+    try {
+      loginMutation.mutate({
+        username: values.username,
+        password: values.password
+      }, {
+        onSuccess: (user) => {
+          console.log("Login successful, user:", user);
+          if (user.role === "manager") {
+            navigate("/manager");
+          } else {
+            navigate("/broker");
+          }
+        },
+        onError: (error) => {
+          console.error("Login error:", error);
         }
-      }
-    });
+      });
+    } catch (error) {
+      console.error("Login exception:", error);
+    }
   };
 
   // Handle registration submission
