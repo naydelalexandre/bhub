@@ -51,13 +51,23 @@ export default function AuthPage() {
       });
       
       if (response.ok) {
-        navigate("/");
+        const user = await response.json();
+        console.log("Login successful:", user);
+        
+        // Navigate based on role
+        if (user.role === "manager") {
+          navigate("/manager");
+        } else {
+          navigate("/broker");
+        }
       } else {
         const error = await response.json();
         console.error("Login failed:", error);
+        alert("Falha no login: " + (error.message || "Credenciais inválidas"));
       }
     } catch (error) {
       console.error("Login error:", error);
+      alert("Erro no login: Verifique sua conexão e tente novamente");
     } finally {
       setIsLoading(false);
     }
@@ -79,13 +89,23 @@ export default function AuthPage() {
       });
       
       if (response.ok) {
-        navigate("/");
+        const user = await response.json();
+        console.log("Registration successful:", user);
+        
+        // Navigate based on role
+        if (user.role === "manager") {
+          navigate("/manager");
+        } else {
+          navigate("/broker");
+        }
       } else {
         const error = await response.json();
         console.error("Registration failed:", error);
+        alert("Falha no cadastro: " + (error.message || "Verifique os dados informados"));
       }
     } catch (error) {
       console.error("Registration error:", error);
+      alert("Erro no cadastro: Verifique sua conexão e tente novamente");
     } finally {
       setIsLoading(false);
     }
