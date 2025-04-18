@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { useLocation } from "wouter";
+import { useEffect } from "react";
 import DashboardHeader from "@/components/layouts/dashboard-header";
 import StatCard from "@/components/dashboard/stat-card";
 import PerformanceCard from "@/components/dashboard/performance-card";
@@ -9,11 +11,36 @@ import NegotiationsCard from "@/components/dashboard/negotiations-card";
 import NotificationsCard from "@/components/dashboard/notifications-card";
 import { WebSocketProvider } from "@/lib/websocket";
 import { Activity, Deal, Notification } from "@shared/schema";
+import { Loader2 } from "lucide-react";
 
 export default function ManagerDashboard() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  const [, navigate] = useLocation();
   
-  // Protected route already ensures user is a manager
+  // Redirect if not authenticated or not a manager
+  useEffect(() => {
+    if (!isLoading) {
+      if (!user) {
+        navigate("/auth");
+      } else if (user.role !== "manager") {
+        navigate("/broker");
+      }
+    }
+  }, [user, isLoading, navigate]);
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // If still loading or no user, don't render dashboard yet
+  if (!user || user.role !== "manager") {
+    return null;
+  }
 
   const { data: activities, isLoading: isActivitiesLoading } = useQuery<Activity[]>({
     queryKey: ["/api/activities"],
@@ -30,8 +57,6 @@ export default function ManagerDashboard() {
   const { data: performances, isLoading: isPerformancesLoading } = useQuery({
     queryKey: ["/api/performance"],
   });
-
-  if (!user) return null;
 
   // Calculate stats
   const pendingActivities = activities?.filter(a => a.status !== "completed").length || 0;

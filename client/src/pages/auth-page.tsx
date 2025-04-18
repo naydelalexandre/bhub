@@ -32,19 +32,8 @@ const registerSchema = z.object({
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function AuthPage() {
-  const { user, loginMutation, registerMutation } = useAuth();
+  const { loginMutation, registerMutation } = useAuth();
   const [, navigate] = useLocation();
-
-  // If already logged in, redirect to appropriate dashboard
-  useEffect(() => {
-    if (user) {
-      if (user.role === "manager") {
-        navigate("/manager");
-      } else if (user.role === "broker") {
-        navigate("/broker");
-      }
-    }
-  }, [user, navigate]);
 
   // Handle login submission
   const handleLogin = async (values: LoginFormValues) => {

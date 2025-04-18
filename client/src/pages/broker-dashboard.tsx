@@ -1,5 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { useLocation } from "wouter";
+import { useEffect } from "react";
 import DashboardHeader from "@/components/layouts/dashboard-header";
 import MobileNavigation from "@/components/layouts/mobile-navigation";
 import StatCard from "@/components/dashboard/stat-card";
@@ -11,11 +13,36 @@ import ChatContainer from "@/components/chat/chat-container";
 import { WebSocketProvider } from "@/lib/websocket";
 import { Activity, Deal, Notification, Performance } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
 
 export default function BrokerDashboard() {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
+  const [, navigate] = useLocation();
   
-  // Protected route already ensures user is a broker
+  // Redirect if not authenticated or not a broker
+  useEffect(() => {
+    if (!isLoading) {
+      if (!user) {
+        navigate("/auth");
+      } else if (user.role !== "broker") {
+        navigate("/manager");
+      }
+    }
+  }, [user, isLoading, navigate]);
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  // If still loading or no user, don't render dashboard yet
+  if (!user || user.role !== "broker") {
+    return null;
+  }
 
   const { data: activities, isLoading: isActivitiesLoading } = useQuery<Activity[]>({
     queryKey: ["/api/activities"],
@@ -43,8 +70,6 @@ export default function BrokerDashboard() {
   });
 
   const manager = users?.find(u => u.role === "manager");
-
-  if (!user) return null;
 
   // Calculate stats
   const pendingActivities = activities?.filter(a => a.status !== "completed").length || 0;

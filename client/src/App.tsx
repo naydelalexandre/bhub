@@ -1,47 +1,55 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { useAuth } from "@/hooks/use-auth";
+import { AuthProvider } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
 import ManagerDashboard from "@/pages/manager-dashboard";
 import BrokerDashboard from "@/pages/broker-dashboard";
 
+// Main App component that sets up providers and basic structure
 function App() {
-  const { user, isLoading } = useAuth();
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
+  );
+}
 
-  // Simple loading spinner while checking authentication
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
+// App content that uses authentication context
+function AppContent() {
   return (
     <TooltipProvider>
       <Toaster />
-      <Switch>
-        {/* If user is not logged in or on auth pages, show auth page */}
-        <Route path="/" component={AuthPage} />
-        <Route path="/auth" component={AuthPage} />
-        
-        {/* Manager route - only show if user is a manager */}
-        <Route path="/manager">
-          {user && user.role === "manager" ? <ManagerDashboard /> : <AuthPage />}
-        </Route>
-        
-        {/* Broker route - only show if user is a broker */}
-        <Route path="/broker">
-          {user && user.role === "broker" ? <BrokerDashboard /> : <AuthPage />}
-        </Route>
-        
-        <Route component={NotFound} />
-      </Switch>
+      <AppRoutes />
     </TooltipProvider>
   );
+}
+
+// Routes component that handles navigation based on auth state
+function AppRoutes() {
+  return (
+    <Switch>
+      <Route path="/" component={AuthPage} />
+      <Route path="/auth" component={AuthPage} />
+      <Route path="/manager" component={ProtectedManagerRoute} />
+      <Route path="/broker" component={ProtectedBrokerRoute} />
+      <Route component={NotFound} />
+    </Switch>
+  );
+}
+
+// Protected route for manager dashboard
+function ProtectedManagerRoute() {
+  // Simple placeholder - we'll check auth in each component itself
+  return <ManagerDashboard />;
+}
+
+// Protected route for broker dashboard
+function ProtectedBrokerRoute() {
+  // Simple placeholder - we'll check auth in each component itself
+  return <BrokerDashboard />;
 }
 
 export default App;
