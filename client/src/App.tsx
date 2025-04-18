@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, Link } from "wouter";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
@@ -6,6 +6,7 @@ import AuthPage from "@/pages/auth-page";
 import ManagerDashboard from "@/pages/manager-dashboard";
 import BrokerDashboard from "@/pages/broker-dashboard";
 import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 // Basic app component as a test
 function App() {
@@ -17,12 +18,7 @@ function App() {
         <div className="mt-8">
           <Switch>
             <Route path="/" component={() => (
-              <div className="text-center">
-                <p className="mb-4">Por favor faça login para acessar o sistema:</p>
-                <a href="/auth" className="text-primary hover:underline">
-                  Ir para página de login
-                </a>
-              </div>
+              <AuthPage />
             )} />
             <Route path="/auth" component={AuthPage} />
             <Route path="/manager" component={ManagerDashboard} />
