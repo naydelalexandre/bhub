@@ -1,0 +1,73 @@
+Plataforma de Performance para Corretores
+
+Objetivo do App
+
+Criar uma plataforma mobile para gestão de atividades, negociações e comunicação entre gestores e corretores imobiliários, com foco na performance individual, acompanhamento de metas e agilidade operacional.
+
+⸻
+
+Principais Funcionalidades
+
+1. Login com Permissão de Acesso
+	•	Tipos de usuários: Gestor e Corretor
+	•	Redirecionamento de dashboards conforme o perfil
+
+⸻
+
+2. Dashboard do Gestor
+	•	Visualização geral de:
+	•	Atividades atribuídas aos corretores
+	•	Status das negociações em andamento
+	•	Score semanal por corretor (baseado nas atividades concluídas)
+	•	Atribuição de atividades manuais e negociações
+	•	Botão de acesso direto ao chat com os corretores
+	•	Relatório de performance semanal por corretor
+
+⸻
+
+3. Dashboard do Corretor
+	•	Visualização de:
+	•	Atividades semanais recebidas
+	•	Negociações em que está envolvido
+	•	Atualizações e notificações
+	•	Possibilidade de marcar atividades como concluídas
+	•	Atualização do status das negociações
+	•	Acesso ao chat com o gestor
+
+⸻
+
+4. Chat Interno (Texto Apenas)
+	•	Comunicação direta entre gestor e corretor
+	•	Histórico de mensagens por usuário
+	•	Notificações push para novas mensagens
+	•	Sem envio de arquivos ou áudios
+
+⸻
+
+5. Acompanhamento de Atividades
+	•	Criação de tarefas manuais pelo gestor
+	•	Definição de responsáveis e prazos
+	•	Corretores atualizam status (Em andamento / Concluído)
+
+⸻
+
+6. Gestão de Negociações
+	•	Cadastro de negociações pelo gestor
+	•	Acompanhamento por etapas (Ex: contato inicial, visita, proposta, fechamento)
+	•	Corretores atualizam etapas conforme evolução da negociação
+
+⸻
+
+7. Notificações em Tempo Real
+	•	Notificações de:
+	•	Novas atividades
+	•	Atualizações de status
+	•	Mensagens recebidas
+	•	Exibição no app com campo de leitura
+
+⸻
+
+8. Relatório de Performance (Score Semanal)
+	•	Sistema de pontuação automática com base nas atividades realizadas
+	•	Exibido apenas ao gestor
+	•	Utilizado como base de acompanhamento interno de performance
