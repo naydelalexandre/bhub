@@ -1,114 +1,81 @@
-import { useState } from "react";
-import { useLocation } from "wouter";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@/components/ui/button";
+import { useEffect } from "react";
+import { useLocation } from "wouter";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2 } from "lucide-react";
 import { getInitials } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 
+// Login schema
 const loginSchema = z.object({
-  username: z.string().email({ message: "Deve ser um email válido" }),
-  password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
-  remember: z.boolean().optional(),
+  username: z.string().email("Por favor insira um email válido"),
+  password: z.string().min(1, "Por favor insira uma senha"),
+  remember: z.boolean().optional().default(false),
 });
-
-const registerSchema = z.object({
-  username: z.string().email({ message: "Deve ser um email válido" }),
-  password: z.string().min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
-  name: z.string().min(3, { message: "O nome deve ter pelo menos 3 caracteres" }),
-  role: z.enum(["manager", "broker"], { 
-    errorMap: () => ({ message: "Selecione um tipo de usuário" })
-  }),
-});
-
 type LoginFormValues = z.infer<typeof loginSchema>;
+
+// Register schema
+const registerSchema = z.object({
+  name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
+  username: z.string().email("Por favor insira um email válido"),
+  password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
+  role: z.enum(["manager", "broker"]),
+});
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
 export default function AuthPage() {
-  const [activeTab, setActiveTab] = useState("login");
-  const [isLoading, setIsLoading] = useState(false);
+  const { user, loginMutation, registerMutation } = useAuth();
   const [, navigate] = useLocation();
 
+  // If already logged in, redirect to appropriate dashboard
+  useEffect(() => {
+    if (user) {
+      if (user.role === "manager") {
+        navigate("/manager");
+      } else if (user.role === "broker") {
+        navigate("/broker");
+      }
+    }
+  }, [user, navigate]);
+
+  // Handle login submission
   const handleLogin = async (values: LoginFormValues) => {
-    setIsLoading(true);
-    try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          username: values.username,
-          password: values.password
-        })
-      });
-      
-      if (response.ok) {
-        const user = await response.json();
-        console.log("Login successful:", user);
-        
-        // Navigate based on role
+    loginMutation.mutate({
+      username: values.username,
+      password: values.password
+    }, {
+      onSuccess: (user) => {
         if (user.role === "manager") {
           navigate("/manager");
         } else {
           navigate("/broker");
         }
-      } else {
-        const error = await response.json();
-        console.error("Login failed:", error);
-        alert("Falha no login: " + (error.message || "Credenciais inválidas"));
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      alert("Erro no login: Verifique sua conexão e tente novamente");
-    } finally {
-      setIsLoading(false);
-    }
+    });
   };
 
+  // Handle registration submission
   const handleRegister = async (values: RegisterFormValues) => {
-    setIsLoading(true);
-    try {
-      const avatarInitials = getInitials(values.name);
-      const response = await fetch('/api/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          ...values,
-          avatarInitials
-        })
-      });
-      
-      if (response.ok) {
-        const user = await response.json();
-        console.log("Registration successful:", user);
-        
-        // Navigate based on role
+    registerMutation.mutate({
+      ...values,
+      avatarInitials: getInitials(values.name)
+    }, {
+      onSuccess: (user) => {
         if (user.role === "manager") {
           navigate("/manager");
         } else {
           navigate("/broker");
         }
-      } else {
-        const error = await response.json();
-        console.error("Registration failed:", error);
-        alert("Falha no cadastro: " + (error.message || "Verifique os dados informados"));
       }
-    } catch (error) {
-      console.error("Registration error:", error);
-      alert("Erro no cadastro: Verifique sua conexão e tente novamente");
-    } finally {
-      setIsLoading(false);
-    }
+    });
   };
 
   return (
@@ -142,7 +109,7 @@ export default function AuthPage() {
                 <CardContent>
                   <LoginForm 
                     onSubmit={handleLogin} 
-                    isLoading={isLoading} 
+                    isLoading={loginMutation.isPending} 
                   />
                 </CardContent>
               </Card>
@@ -159,7 +126,7 @@ export default function AuthPage() {
                 <CardContent>
                   <RegisterForm 
                     onSubmit={handleRegister} 
-                    isLoading={isLoading} 
+                    isLoading={registerMutation.isPending} 
                   />
                 </CardContent>
               </Card>

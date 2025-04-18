@@ -14,6 +14,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function BrokerDashboard() {
   const { user } = useAuth();
+  
+  // Protected route already ensures user is a broker
 
   const { data: activities, isLoading: isActivitiesLoading } = useQuery<Activity[]>({
     queryKey: ["/api/activities"],

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import DashboardHeader from "@/components/layouts/dashboard-header";
@@ -13,6 +12,8 @@ import { Activity, Deal, Notification } from "@shared/schema";
 
 export default function ManagerDashboard() {
   const { user } = useAuth();
+  
+  // Protected route already ensures user is a manager
 
   const { data: activities, isLoading: isActivitiesLoading } = useQuery<Activity[]>({
     queryKey: ["/api/activities"],
