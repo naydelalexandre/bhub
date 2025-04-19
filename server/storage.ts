@@ -7,6 +7,8 @@ import session from "express-session";
 import createMemoryStore from "memorystore";
 
 const MemoryStore = createMemoryStore(session);
+// Usamos any para simplificar a tipagem do sessionStore
+type SessionStoreType = any;
 
 export interface IStorage {
   // User methods
@@ -37,6 +39,9 @@ export interface IStorage {
   getMessagesBetweenUsers(userId1: number, userId2: number): Promise<Message[]>;
   createMessage(message: InsertMessage): Promise<Message>;
   markMessageAsRead(id: number): Promise<Message | undefined>;
+  getTeamMessages(): Promise<Message[]>;
+  createTeamMessage(message: InsertMessage): Promise<Message>;
+  markMessageAsReadForUser(messageId: number, userId: number): Promise<void>;
   
   // Notification methods
   getNotification(id: number): Promise<Notification | undefined>;
@@ -53,7 +58,19 @@ export interface IStorage {
   updatePerformance(id: number, performance: Partial<Performance>): Promise<Performance | undefined>;
   
   // Session store
-  sessionStore: session.SessionStore;
+  sessionStore: SessionStoreType;
+  
+  // Métodos para equipes e relacionamentos
+  getTeam(id: number): Promise<any | undefined>;
+  createTeam(team: { name: string; managerId: number }): Promise<any>;
+  getUsersByTeam(teamId: number): Promise<User[]>;
+  addUserToTeam(userId: number, teamId: number): Promise<User | undefined>;
+  removeUserFromTeam(userId: number): Promise<User | undefined>;
+  
+  // Métodos para a visão da diretoria
+  getAllActivities(): Promise<Activity[]>;
+  getAllDeals(): Promise<Deal[]>;
+  getBrokersByManager(managerId: number): Promise<User[]>;
 }
 
 export class MemStorage implements IStorage {
@@ -63,14 +80,16 @@ export class MemStorage implements IStorage {
   private messages: Map<number, Message>;
   private notifications: Map<number, Notification>;
   private performances: Map<number, Performance>;
+  private teams: Map<number, any>;
   
-  sessionStore: session.SessionStore;
+  sessionStore: SessionStoreType;
   private userId: number = 1;
   private activityId: number = 1;
   private dealId: number = 1;
   private messageId: number = 1;
   private notificationId: number = 1;
   private performanceId: number = 1;
+  private teamId: number = 1;
 
   constructor() {
     this.users = new Map();
@@ -79,6 +98,7 @@ export class MemStorage implements IStorage {
     this.messages = new Map();
     this.notifications = new Map();
     this.performances = new Map();
+    this.teams = new Map();
     
     this.sessionStore = new MemoryStore({
       checkPeriod: 86400000
@@ -163,6 +183,10 @@ export class MemStorage implements IStorage {
     const newActivity: Activity = { 
       ...activity, 
       id, 
+      status: activity.status || "pending",
+      description: activity.description || null,
+      clientName: activity.clientName || null,
+      propertyInfo: activity.propertyInfo || null,
       createdAt: now 
     };
     this.activities.set(id, newActivity);
@@ -205,6 +229,8 @@ export class MemStorage implements IStorage {
     const newDeal: Deal = { 
       ...deal, 
       id, 
+      stage: deal.stage || "initial_contact",
+      priority: deal.priority || "medium",
       lastUpdated: now,
       createdAt: now 
     };
@@ -240,6 +266,12 @@ export class MemStorage implements IStorage {
       .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   }
 
+  async getTeamMessages(): Promise<Message[]> {
+    return Array.from(this.messages.values())
+      .filter(message => message.receiverId === 0) // receiverId 0 for team messages
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+  }
+
   async createMessage(message: InsertMessage): Promise<Message> {
     const id = this.messageId++;
     const now = new Date();
@@ -253,6 +285,11 @@ export class MemStorage implements IStorage {
     return newMessage;
   }
 
+  async createTeamMessage(message: InsertMessage): Promise<Message> {
+    // Uses same implementation as regular messages, but team messages have receiverId=0
+    return this.createMessage(message);
+  }
+
   async markMessageAsRead(id: number): Promise<Message | undefined> {
     const message = this.messages.get(id);
     if (!message) return undefined;
@@ -260,6 +297,13 @@ export class MemStorage implements IStorage {
     const updatedMessage = { ...message, read: true };
     this.messages.set(id, updatedMessage);
     return updatedMessage;
+  }
+
+  async markMessageAsReadForUser(messageId: number, userId: number): Promise<void> {
+    // For team messages, we need a way to track which users have read the message
+    // In a real implementation, this would use a join table
+    // For this demo, we'll just mark the message as read globally
+    await this.markMessageAsRead(messageId);
   }
 
   // Notification methods
@@ -279,6 +323,8 @@ export class MemStorage implements IStorage {
     const newNotification: Notification = { 
       ...notification, 
       id, 
+      relatedId: notification.relatedId || null,
+      relatedType: notification.relatedType || null,
       read: false,
       createdAt: now 
     };
@@ -326,7 +372,12 @@ export class MemStorage implements IStorage {
 
   async createPerformance(performance: InsertPerformance): Promise<Performance> {
     const id = this.performanceId++;
-    const newPerformance: Performance = { ...performance, id };
+    const newPerformance: Performance = { 
+      ...performance, 
+      id,
+      activitiesCompleted: performance.activitiesCompleted || 0,
+      dealsProgressed: performance.dealsProgressed || 0 
+    };
     this.performances.set(id, newPerformance);
     return newPerformance;
   }
@@ -338,6 +389,120 @@ export class MemStorage implements IStorage {
     const updatedPerformance = { ...performance, ...performanceUpdate };
     this.performances.set(id, updatedPerformance);
     return updatedPerformance;
+  }
+
+  // Team methods
+  async getTeam(id: number): Promise<any | undefined> {
+    return this.teams.get(id);
+  }
+  
+  async createTeam(team: { name: string; managerId: number }): Promise<any> {
+    const id = this.teamId++;
+    const now = new Date();
+    const newTeam = {
+      ...team,
+      id,
+      createdAt: now
+    };
+    this.teams.set(id, newTeam);
+    return newTeam;
+  }
+  
+  async getUsersByTeam(teamId: number): Promise<User[]> {
+    return Array.from(this.users.values()).filter(user => user.teamId === teamId);
+  }
+  
+  async addUserToTeam(userId: number, teamId: number): Promise<User | undefined> {
+    const user = this.users.get(userId);
+    if (!user) return undefined;
+    
+    const team = this.teams.get(teamId);
+    if (!team) return undefined;
+    
+    // Se o usuário for um corretor e a equipe pertencer a um gerente,
+    // definir o gerente como responsável pelo corretor
+    if (user.role === 'broker') {
+      user.managerId = team.managerId;
+    }
+    
+    user.teamId = teamId;
+    this.users.set(userId, user);
+    return user;
+  }
+  
+  async removeUserFromTeam(userId: number): Promise<User | undefined> {
+    const user = this.users.get(userId);
+    if (!user) return undefined;
+    
+    user.teamId = undefined;
+    
+    // Se o usuário for um corretor, remover a referência ao gerente
+    if (user.role === 'broker') {
+      user.managerId = undefined;
+    }
+    
+    this.users.set(userId, user);
+    return user;
+  }
+
+  // Métodos para a visão da diretoria
+  async getAllActivities(): Promise<Activity[]> {
+    return Array.from(this.activities.values());
+  }
+  
+  async getAllDeals(): Promise<Deal[]> {
+    return Array.from(this.deals.values());
+  }
+  
+  async getBrokersByManager(managerId: number): Promise<User[]> {
+    // Na implementação atual, não há uma relação direta entre gerentes e corretores
+    // Vamos usar a relação criada pelos campos managerId
+    
+    // Primeiramente, buscar corretores que têm este gerente como responsável direto
+    const brokersByManagerId = Array.from(this.users.values())
+      .filter(user => user.role === "broker" && user.managerId === managerId);
+    
+    if (brokersByManagerId.length > 0) {
+      return brokersByManagerId;
+    }
+    
+    // Se não houver relação direta, tentar encontrar por equipe
+    const manager = await this.getUser(managerId);
+    if (!manager || manager.role !== "manager") return [];
+    
+    // Se o gerente tem uma equipe, buscar corretores dessa equipe
+    if (manager.teamId) {
+      return Array.from(this.users.values())
+        .filter(user => user.role === "broker" && user.teamId === manager.teamId);
+    }
+    
+    // Se nenhuma das opções acima funcionar, buscar por atividades e negócios como antes
+    const activities = await this.getActivitiesByManager(managerId);
+    const deals = await this.getDealsByManager(managerId);
+    
+    // Coletar IDs de corretores únicos para os quais o gerente atribuiu atividades ou negócios
+    const brokerIds = new Set<number>();
+    
+    activities.forEach(activity => {
+      brokerIds.add(activity.assignedTo);
+    });
+    
+    deals.forEach(deal => {
+      brokerIds.add(deal.assignedTo);
+    });
+    
+    // Obter os usuários correspondentes aos IDs de corretores
+    const brokers: User[] = [];
+    
+    // Converter para array antes de iterar
+    for (const brokerId of Array.from(brokerIds)) {
+      const broker = await this.getUser(brokerId);
+      if (broker && broker.role === "broker") {
+        brokers.push(broker);
+      }
+    }
+    
+    return brokers;
   }
 }
 

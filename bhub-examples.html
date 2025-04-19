@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B.Hub - Exemplos Visuais das Implementações</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 { color: #3b82f6; margin-bottom: 30px; text-align: center; }
+        h2 { color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
+        .feature-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .screenshot {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #e5e7eb;
+        }
+        .code-snippet {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin: 15px 0;
+        }
+        .visual-example {
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .example-header {
+            padding: 12px 16px;
+            background: #f3f4f6;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            font-weight: bold;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .example-content {
+            padding: 16px;
+        }
+        .message {
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        .my-message {
+            background: #3b82f6;
+            color: white;
+            margin-left: auto;
+        }
+        .their-message {
+            background: #e5e7eb;
+            color: #1f2937;
+        }
+        .chart-container {
+            height: 300px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="300" viewBox="0 0 800 300"><path d="M50,250 L750,250" stroke="%23E5E7EB" stroke-width="2"/><path d="M50,200 L750,200" stroke="%23E5E7EB" stroke-width="2"/><path d="M50,150 L750,150" stroke="%23E5E7EB" stroke-width="2"/><path d="M50,100 L750,100" stroke="%23E5E7EB" stroke-width="2"/><path d="M50,50 L750,50" stroke="%23E5E7EB" stroke-width="2"/><path d="M50,250 L50,50" stroke="%23E5E7EB" stroke-width="2"/><path d="M150,250 L150,50" stroke="%23E5E7EB" stroke-width="2"/><path d="M250,250 L250,50" stroke="%23E5E7EB" stroke-width="2"/><path d="M350,250 L350,50" stroke="%23E5E7EB" stroke-width="2"/><path d="M450,250 L450,50" stroke="%23E5E7EB" stroke-width="2"/><path d="M550,250 L550,50" stroke="%23E5E7EB" stroke-width="2"/><path d="M650,250 L650,50" stroke="%23E5E7EB" stroke-width="2"/><path d="M750,250 L750,50" stroke="%23E5E7EB" stroke-width="2"/><path d="M50,250 L150,180 L250,200 L350,120 L450,80 L550,100 L650,60 L750,90" stroke="%233B82F6" stroke-width="3" fill="none"/><circle cx="150" cy="180" r="4" fill="%233B82F6"/><circle cx="250" cy="200" r="4" fill="%233B82F6"/><circle cx="350" cy="120" r="4" fill="%233B82F6"/><circle cx="450" cy="80" r="4" fill="%233B82F6"/><circle cx="550" cy="100" r="4" fill="%233B82F6"/><circle cx="650" cy="60" r="4" fill="%233B82F6"/><circle cx="750" cy="90" r="4" fill="%233B82F6"/></svg>') no-repeat center;
+            background-size: contain;
+            margin: 15px 0;
+        }
+        .pie-chart {
+            height: 250px;
+            width: 250px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="250" height="250" viewBox="0 0 250 250"><circle cx="125" cy="125" r="100" fill="none" stroke="%23E5E7EB" stroke-width="2"/><path d="M125,125 L125,25 A100,100 0 0,1 208,181 L125,125" fill="%233B82F6"/><path d="M125,125 L208,181 A100,100 0 0,1 42,181 L125,125" fill="%2310B981"/><path d="M125,125 L42,181 A100,100 0 0,1 125,25 L125,125" fill="%23F59E0B"/></svg>') no-repeat center;
+            background-size: contain;
+            margin: 0 auto;
+        }
+        .form-field {
+            margin-bottom: 15px;
+        }
+        .form-field label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-field input, .form-field textarea, .form-field select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+        }
+        .btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>B.Hub - Exemplos Visuais das Implementações</h1>
+    
+    <div class="feature-card">
+        <h2>1. Chat de Equipe para o Gerente</h2>
+        
+        <p>O chat de equipe do gerente permite enviar mensagens para toda a equipe de uma vez, usando <code>receiverId=0</code> para identificar mensagens de equipe.</p>
+        
+        <div class="code-snippet">// Buscar mensagens da equipe
+const { data: messages } = useQuery<Message[]>({
+  queryKey: ["/api/messages/team"],
+  queryFn: async () => {
+    const res = await fetch("/api/messages/team");
+    if (!res.ok) throw new Error("Failed to fetch team messages");
+    return res.json();
+  }
+});
+
+// Enviar mensagem para a equipe (usando receiverId=0)
+await fetch("/api/messages", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    content: message,
+    receiverId: 0  // O valor 0 identifica mensagens de equipe
+  })
+});</div>
+        
+        <h3>Exemplo Visual:</h3>
+        <div class="visual-example">
+            <div class="example-header">Comunicação em Equipe - Gestor Márcio</div>
+            <div class="example-content">
+                <div class="message my-message">Olá equipe, preciso que todos atualizem suas atividades hoje.</div>
+                <div class="message their-message">Ana Rodrigues: Já atualizei as minhas!</div>
+                <div class="message their-message">Carlos Silva: Vou atualizar até às 15h.</div>
+                <div class="message my-message">Excelente! Estou acompanhando o progresso no painel de desempenho.</div>
+                <div style="display: flex; margin-top: 20px;">
+                    <input type="text" placeholder="Digite sua mensagem..." style="flex: 1; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; margin-right: 8px;">
+                    <button class="btn">Enviar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="feature-card">
+        <h2>2. Gestão Simplificada de Tarefas</h2>
+        
+        <p>Otimizamos o formulário de tarefas para aumentar a eficiência, focando apenas nos elementos essenciais da atividade.</p>
+        
+        <div class="code-snippet">// Estrutura otimizada para criação de tarefas
+const createActivitySchema = z.object({
+  titulo: z.string().min(3, { message: "O título deve ter pelo menos 3 caracteres" }),
+  descricao: z.string().optional(),
+  responsavel: z.number({ message: "Selecione um corretor responsável" }),
+  prazo: z.string().min(1, { message: "Defina um prazo para conclusão" }),
+});</div>
+        
+        <h3>Exemplo Visual - Antes:</h3>
+        <div class="visual-example">
+            <div class="example-header">Formulário de Tarefa - Versão Anterior</div>
+            <div class="example-content">
+                <div class="form-field">
+                    <label>Título</label>
+                    <input type="text" value="Ligar para cliente">
+                </div>
+                <div class="form-field">
+                    <label>Descrição</label>
+                    <textarea>Confirmar interesse na propriedade.</textarea>
+                </div>
+                <div class="form-field">
+                    <label>Cliente</label>
+                    <select>
+                        <option>João Silva</option>
+                        <option>Maria Oliveira</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>Imóvel</label>
+                    <select>
+                        <option>Apartamento 302 - Leblon</option>
+                        <option>Casa 45 - Barra da Tijuca</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>Corretor</label>
+                    <select>
+                        <option>Ana Rodrigues</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>Data de vencimento</label>
+                    <input type="date" value="2023-06-15">
+                </div>
+                <button class="btn">Salvar Atividade</button>
+            </div>
+        </div>
+        
+        <h3>Exemplo Visual - Depois:</h3>
+        <div class="visual-example">
+            <div class="example-header">Formulário de Tarefa - Versão Otimizada</div>
+            <div class="example-content">
+                <div class="form-field">
+                    <label>Título</label>
+                    <input type="text" value="Ligar para cliente">
+                </div>
+                <div class="form-field">
+                    <label>Descrição</label>
+                    <textarea>Confirmar interesse na propriedade.</textarea>
+                </div>
+                <div class="form-field">
+                    <label>Corretor</label>
+                    <select>
+                        <option>Ana Rodrigues</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>Data de vencimento</label>
+                    <input type="date" value="2023-06-15">
+                </div>
+                <button class="btn">Salvar Tarefa</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="feature-card">
+        <h2>3. Análise de Desempenho Visual</h2>
+        
+        <p>Desenvolvemos visualizações de dados interativas que oferecem múltiplas perspectivas para análise de desempenho e tomada de decisão.</p>
+        
+        <div class="code-snippet">// Componente para visualizações múltiplas
+<Tabs defaultValue="tendencias">
+  <TabsList className="grid w-full grid-cols-4">
+    <TabsTrigger value="tendencias">Tendências</TabsTrigger>
+    <TabsTrigger value="atividades">Atividades</TabsTrigger>
+    <TabsTrigger value="negocios">Negócios</TabsTrigger>
+    <TabsTrigger value="equipe">Equipe</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="tendencias">
+    <div className="h-[300px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={performanceTrendData}>
+          {/* ... configurações do gráfico ... */}
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  </TabsContent>
+  
+  {/* ... outros tabs com diferentes tipos de gráfico ... */}
+</Tabs></div>
+        
+        <h3>Exemplo Visual:</h3>
+        <div class="visual-example">
+            <div class="example-header">
+                <div style="display: flex; border-bottom: 1px solid #e5e7eb;">
+                    <div style="flex: 1; text-align: center; padding: 8px; background: #3b82f6; color: white; border-radius: 4px 4px 0 0;">Tendências</div>
+                    <div style="flex: 1; text-align: center; padding: 8px;">Atividades</div>
+                    <div style="flex: 1; text-align: center; padding: 8px;">Negociações</div>
+                    <div style="flex: 1; text-align: center; padding: 8px;">Equipe</div>
+                </div>
+            </div>
+            <div class="example-content">
+                <div class="chart-container"></div>
+                <div style="display: flex; justify-content: space-between; color: #6b7280; font-size: 0.875rem;">
+                    <div>Segunda</div>
+                    <div>Terça</div>
+                    <div>Quarta</div>
+                    <div>Quinta</div>
+                    <div>Sexta</div>
+                    <div>Sábado</div>
+                    <div>Domingo</div>
+                </div>
+            </div>
+        </div>
+        
+        <h3>Gráfico de Pizza - Atividades por Status:</h3>
+        <div class="visual-example">
+            <div class="example-header">Distribuição de Atividades</div>
+            <div class="example-content">
+                <div class="pie-chart"></div>
+                <div style="display: flex; justify-content: center; margin-top: 20px;">
+                    <div style="margin: 0 15px;"><span style="display: inline-block; width: 12px; height: 12px; background: #3B82F6; margin-right: 5px;"></span> Pendentes (45%)</div>
+                    <div style="margin: 0 15px;"><span style="display: inline-block; width: 12px; height: 12px; background: #10B981; margin-right: 5px;"></span> Em Progresso (30%)</div>
+                    <div style="margin: 0 15px;"><span style="display: inline-block; width: 12px; height: 12px; background: #F59E0B; margin-right: 5px;"></span> Concluídas (25%)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="feature-card">
+        <h2>Conclusão</h2>
+        <p>Estas melhorias tornam o B.Hub mais eficiente e fácil de usar:</p>
+        <ul>
+            <li>O chat de equipe facilita a comunicação entre gerente e corretores</li>
+            <li>Formulários simplificados aumentam a produtividade</li>
+            <li>Gráficos avançados permitem análises mais detalhadas do desempenho</li>
+        </ul>
+        <p>Todas estas funcionalidades estão implementadas no código usando <code>receiverId=0</code> para mensagens de equipe, schemas simplificados para atividades e componentes de visualização de dados.</p>
+    </div>
+</body>
+</html> 

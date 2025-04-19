@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B.Hub - Sistema de Gamificação</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 { color: #3b82f6; margin-bottom: 30px; text-align: center; }
+        h2 { color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
+        .feature-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .code-snippet {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin: 15px 0;
+        }
+        .visual-example {
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .example-header {
+            padding: 12px 16px;
+            background: #f3f4f6;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            font-weight: bold;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .example-content {
+            padding: 16px;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #e5e7eb;
+            color: #1f2937;
+            border-radius: 9999px;
+            padding: 4px 12px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        .badge-bronze {
+            background: #CD7F32;
+            color: white;
+        }
+        .badge-silver {
+            background: #C0C0C0;
+            color: white;
+        }
+        .badge-gold {
+            background: #FFD700;
+            color: #1f2937;
+        }
+        .badge-platinum {
+            background: #E5E4E2;
+            color: #1f2937;
+        }
+        .badge-diamond {
+            background: linear-gradient(135deg, #b3d9ff, #80c1ff, #4da9ff);
+            color: white;
+        }
+        .achievement {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border-left: 4px solid #3b82f6;
+        }
+        .achievement-icon {
+            width: 32px;
+            height: 32px;
+            background: #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 12px;
+            font-weight: bold;
+        }
+        .achievement-info {
+            flex: 1;
+        }
+        .achievement-title {
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .achievement-description {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .progress-bar {
+            height: 10px;
+            background: #e5e7eb;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #3b82f6;
+            border-radius: 5px;
+        }
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .ranking-table th, .ranking-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .ranking-table th {
+            background: #f3f4f6;
+            font-weight: bold;
+        }
+        .ranking-table tr:nth-child(1) td:first-child {
+            position: relative;
+        }
+        .ranking-table tr:nth-child(1) td:first-child::before {
+            content: "🥇";
+            margin-right: 8px;
+        }
+        .ranking-table tr:nth-child(2) td:first-child::before {
+            content: "🥈";
+            margin-right: 8px;
+        }
+        .ranking-table tr:nth-child(3) td:first-child::before {
+            content: "🥉";
+            margin-right: 8px;
+        }
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            border-bottom: 2px solid #3b82f6;
+            font-weight: bold;
+            color: #3b82f6;
+        }
+        .level-progress {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 30px 0;
+        }
+        .level-marker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 2;
+        }
+        .level-dot {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            margin-bottom: 8px;
+        }
+        .level-dot.active {
+            background: #3b82f6;
+        }
+        .level-dot.completed {
+            background: #10b981;
+        }
+        .level-name {
+            font-size: 12px;
+            color: #6b7280;
+        }
+        .level-line {
+            position: absolute;
+            height: 4px;
+            background: #e5e7eb;
+            top: 8px;
+            left: 10px;
+            right: 10px;
+            z-index: 1;
+        }
+        .level-line-fill {
+            position: absolute;
+            height: 4px;
+            background: #3b82f6;
+            top: 0;
+            left: 0;
+            width: 42%; /* Ajustar conforme nível */
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <h1>B.Hub - Sistema de Gamificação</h1>
+    
+    <div class="intro">
+        <p>O sistema de gamificação do B.Hub foi desenvolvido para motivar os corretores através de mecânicas de jogos, transformando o ambiente de trabalho em uma experiência mais dinâmica e engajadora.</p>
+    </div>
+    
+    <div class="feature-card">
+        <h2>1. Perfil de Gamificação</h2>
+        
+        <p>Cada usuário possui um perfil de gamificação personalizado que registra seu progresso, conquistas e posição no ranking.</p>
+        
+        <div class="code-snippet">// Interface do perfil de gamificação
+interface GamificationProfile {
+  id: number;              // ID do usuário
+  name: string;            // Nome completo
+  level: number;           // Nível atual do usuário
+  totalPoints: number;     // Total de pontos acumulados
+  weeklyPoints: number;    // Pontos obtidos na semana atual
+  currentStreak: number;   // Sequência atual de dias ativos
+  achievements: Achievement[]; // Lista de conquistas obtidas
+}
+
+// Exemplo de uso do hook de perfil
+const { data: profile } = useQuery({
+  queryKey: ["/api/gamification/profile"],
+  queryFn: fetchUserProfile
+});</div>
+        
+        <h3>Visualização do Perfil:</h3>
+        <div class="visual-example">
+            <div class="example-header">Perfil de Gamificação - Ana Rodrigues</div>
+            <div class="profile-section">
+                <div class="profile-header">
+                    <div class="avatar">AR</div>
+                    <div class="profile-info">
+                        <h3>Ana Rodrigues</h3>
+                        <div class="level-badge">Nível 8</div>
+                        <div class="streak-badge">🔥 15 dias consecutivos</div>
+                    </div>
+                </div>
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <div class="stat-value">1,850</div>
+                        <div class="stat-label">Pontos Totais</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">230</div>
+                        <div class="stat-label">Pontos Semanais</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">12/25</div>
+                        <div class="stat-label">Conquistas</div>
+                    </div>
+                </div>
+                <div class="level-progress">
+                    <div class="progress-label">Progresso para Nível 9</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 65%;"></div>
+                    </div>
+                    <div class="progress-text">650/1000 pontos</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="feature-card">
+        <h2>2. Sistema de Conquistas</h2>
+        
+        <p>O sistema conta com diversas categorias de conquistas que podem ser desbloqueadas pelos usuários ao cumprirem requisitos específicos.</p>
+        
+        <div class="code-snippet">// Interface de conquistas
+interface Achievement {
+  id: number;           // ID da conquista
+  name: string;         // Nome da conquista
+  description: string;  // Descrição detalhada
+  points: number;       // Pontos concedidos ao conquistar
+  category: string;     // Categoria (Atividades, Negociações, Participação)
+  icon: string;         // Ícone representativo
+  unlockedAt?: Date;    // Data de desbloqueio (se conquistada)
+  progress?: number;    // Progresso atual (0-100%)
+  difficulty: string;   // Nível de dificuldade (Fácil, Médio, Difícil)
+}
+
+// Verificar uma conquista específica
+const checkAchievement = async (userId: number, achievementId: number) => {
+  const response = await fetch(`/api/gamification/check-achievement`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, achievementId })
+  });
+  return response.json();
+};</div>
+        
+        <h3>Exemplos de Conquistas:</h3>
+        <div class="achievements-grid">
+            <div class="achievement-card unlocked">
+                <div class="achievement-icon">🏆</div>
+                <div class="achievement-content">
+                    <h4>Primeira Venda</h4>
+                    <p>Realize sua primeira venda como corretor</p>
+                    <div class="achievement-meta">
+                        <span class="achievement-points">+100 pontos</span>
+                        <span class="achievement-category">Negociações</span>
+                        <span class="achievement-difficulty">Fácil</span>
+                    </div>
+                    <div class="achievement-unlock-date">Desbloqueada em: 12/05/2023</div>
+                </div>
+            </div>
+            
+            <div class="achievement-card in-progress">
+                <div class="achievement-icon">⏱️</div>
+                <div class="achievement-content">
+                    <h4>Pontualidade Exemplar</h4>
+                    <p>Complete 20 atividades antes do prazo</p>
+                    <div class="achievement-meta">
+                        <span class="achievement-points">+200 pontos</span>
+                        <span class="achievement-category">Atividades</span>
+                        <span class="achievement-difficulty">Médio</span>
+                    </div>
+                    <div class="achievement-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 70%;"></div>
+                        </div>
+                        <div class="progress-text">14/20 completadas</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="achievement-card locked">
+                <div class="achievement-icon">🌟</div>
+                <div class="achievement-content">
+                    <h4>Destaque da Equipe</h4>
+                    <p>Fique em 1º lugar no ranking por 3 semanas consecutivas</p>
+                    <div class="achievement-meta">
+                        <span class="achievement-points">+500 pontos</span>
+                        <span class="achievement-category">Participação</span>
+                        <span class="achievement-difficulty">Difícil</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="feature-card">
+        <h2>3. Ranking Semanal</h2>
+        
+        <p>O sistema mantém um ranking semanal que é atualizado automaticamente, mostrando os corretores com melhor desempenho na semana atual.</p>
+        
+        <div class="code-snippet">// Interface do ranking
+interface RankingEntry {
+  userId: number;         // ID do usuário
+  name: string;           // Nome do usuário
+  avatarInitials: string; // Iniciais para o avatar
+  position: number;       // Posição no ranking
+  totalPoints: number;    // Total de pontos acumulados
+  weeklyPoints: number;   // Pontos obtidos na semana atual
+  previousPosition?: number; // Posição anterior (para mostrar variação)
+}
+
+// Buscar o ranking semanal
+const fetchWeeklyRanking = async () => {
+  const response = await fetch('/api/gamification/ranking/weekly');
+  if (!response.ok) {
+    throw new Error('Falha ao buscar o ranking semanal');
+  }
+  return response.json();
+};</div>
+        
+        <h3>Visualização do Ranking:</h3>
+        <div class="visual-example">
+            <div class="example-header">Ranking Semanal - Top 5</div>
+            <div class="ranking-table">
+                <div class="ranking-header">
+                    <div class="ranking-cell">Posição</div>
+                    <div class="ranking-cell">Corretor</div>
+                    <div class="ranking-cell">Pontos na Semana</div>
+                    <div class="ranking-cell">Variação</div>
+                </div>
+                
+                <div class="ranking-row highlight">
+                    <div class="ranking-cell position">1</div>
+                    <div class="ranking-cell user">
+                        <div class="avatar small">AR</div>
+                        <span>Ana Rodrigues</span>
+                    </div>
+                    <div class="ranking-cell points">230</div>
+                    <div class="ranking-cell change up">+2</div>
+                </div>
+                
+                <div class="ranking-row">
+                    <div class="ranking-cell position">2</div>
+                    <div class="ranking-cell user">
+                        <div class="avatar small">CS</div>
+                        <span>Carlos Silva</span>
+                    </div>
+                    <div class="ranking-cell points">215</div>
+                    <div class="ranking-cell change down">-1</div>
+                </div>
+                
+                <div class="ranking-row">
+                    <div class="ranking-cell position">3</div>
+                    <div class="ranking-cell user">
+                        <div class="avatar small">ML</div>
+                        <span>Maria Lima</span>
+                    </div>
+                    <div class="ranking-cell points">192</div>
+                    <div class="ranking-cell change up">+1</div>
+                </div>
+                
+                <div class="ranking-row">
+                    <div class="ranking-cell position">4</div>
+                    <div class="ranking-cell user">
+                        <div class="avatar small">RP</div>
+                        <span>Rafael Pereira</span>
+                    </div>
+                    <div class="ranking-cell points">175</div>
+                    <div class="ranking-cell change down">-2</div>
+                </div>
+                
+                <div class="ranking-row">
+                    <div class="ranking-cell position">5</div>
+                    <div class="ranking-cell user">
+                        <div class="avatar small">JA</div>
+                        <span>Juliana Almeida</span>
+                    </div>
+                    <div class="ranking-cell points">150</div>
+                    <div class="ranking-cell change">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="feature-card">
+        <h2>Integração no Sistema</h2>
+        <p>O sistema de gamificação do B.Hub é completamente integrado ao fluxo de trabalho dos corretores, recompensando-os por:</p>
+        <ul>
+            <li>Conclusão de atividades dentro do prazo</li>
+            <li>Progresso em negociações</li>
+            <li>Uso consistente da plataforma</li>
+            <li>Colaboração com a equipe</li>
+            <li>Atendimento de metas individuais e coletivas</li>
+        </ul>
+        <p>Os pontos são calculados automaticamente a partir das ações dos usuários, garantindo transparência e motivação contínua.</p>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrokerBooster - Sistema de Gamificação</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2196f3;
+            border-bottom: 2px solid #2196f3;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #ff9800;
+            margin-top: 30px;
+        }
+        .card {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .feature {
+            display: flex;
+            margin-bottom: 30px;
+        }
+        .feature-icon {
+            font-size: 24px;
+            margin-right: 15px;
+            color: #2196f3;
+            min-width: 40px;
+            text-align: center;
+        }
+        .feature-content {
+            flex: 1;
+        }
+        .role-access {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        .role {
+            font-weight: bold;
+            color: #1976d2;
+        }
+        code {
+            background-color: #f0f0f0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .route {
+            background-color: #fffde7;
+            padding: 10px;
+            border-left: 4px solid #fbc02d;
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .level {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-right: 5px;
+            font-weight: bold;
+        }
+        .bronze { background-color: #CD7F32; color: white; }
+        .silver { background-color: #C0C0C0; color: black; }
+        .gold { background-color: #FFD700; color: black; }
+        .platinum { background-color: #E5E4E2; color: black; }
+        .diamond { background-color: #B9F2FF; color: black; }
+    </style>
+</head>
+<body>
+    <h1>BrokerBooster - Sistema de Gamificação</h1>
+    
+    <div class="card">
+        <p>O sistema de gamificação foi implementado com sucesso no BrokerBooster! Esta página demonstra as funcionalidades e rotas implementadas para o sistema de gamificação.</p>
+    </div>
+    
+    <h2>Funcionalidades Principais</h2>
+    
+    <div class="feature">
+        <div class="feature-icon">🏆</div>
+        <div class="feature-content">
+            <h3>Sistema de Pontos e Níveis</h3>
+            <p>Os usuários ganham pontos por suas atividades no sistema e sobem de nível conforme acumulam pontos:</p>
+            <p>
+                <span class="level bronze">Bronze</span>
+                <span class="level silver">Silver</span>
+                <span class="level gold">Gold</span>
+                <span class="level platinum">Platinum</span>
+                <span class="level diamond">Diamond</span>
+            </p>
+            <p>Cada nível exige uma quantidade específica de pontos para ser alcançado.</p>
+        </div>
+    </div>
+    
+    <div class="feature">
+        <div class="feature-icon">🎯</div>
+        <div class="feature-content">
+            <h3>Conquistas</h3>
+            <p>Os usuários podem desbloquear conquistas realizando ações específicas:</p>
+            <ul>
+                <li>Completar atividades</li>
+                <li>Progredir negociações</li>
+                <li>Enviar mensagens</li>
+                <li>Manter uma sequência de login</li>
+                <li>E muito mais!</li>
+            </ul>
+            <p>Cada conquista concede pontos de recompensa ao ser completada.</p>
+        </div>
+    </div>
+    
+    <div class="feature">
+        <div class="feature-icon">📊</div>
+        <div class="feature-content">
+            <h3>Rankings e Competição</h3>
+            <p>O sistema exibe rankings semanais para estimular a competição saudável:</p>
+            <ul>
+                <li>Ranking geral (visível para diretores)</li>
+                <li>Ranking por equipe (visível para gerentes e membros da equipe)</li>
+                <li>Ranking por tipo de usuário (corretores vs. gerentes)</li>
+            </ul>
+        </div>
+    </div>
+    
+    <h2>Rotas Implementadas</h2>
+    
+    <div class="card">
+        <p>Foram implementadas as seguintes rotas para o sistema de gamificação:</p>
+        
+        <div class="route">GET /api/gamification/profile</div>
+        <p>Obtém o perfil de gamificação do usuário autenticado, incluindo nível, pontos e progresso.</p>
+        <div class="role-access">
+            <span class="role">Acesso:</span> Todos os usuários autenticados podem ver seu próprio perfil.
+        </div>
+        
+        <div class="route">GET /api/gamification/points-history</div>
+        <p>Retorna o histórico de pontos do usuário, mostrando quando e por quais ações os pontos foram ganhos.</p>
+        <div class="role-access">
+            <span class="role">Acesso:</span> Todos os usuários autenticados podem ver seu próprio histórico.
+        </div>
+        
+        <div class="route">GET /api/gamification/achievements</div>
+        <p>Lista todas as conquistas disponíveis com o progresso do usuário em cada uma.</p>
+        <div class="role-access">
+            <span class="role">Acesso:</span> Todos os usuários autenticados.
+        </div>
+        
+        <div class="route">GET /api/gamification/weekly-ranking</div>
+        <p>Exibe o ranking semanal de pontos, filtrado de acordo com o nível de acesso do usuário.</p>
+        <div class="role-access">
+            <span class="role">Acesso:</span> Diretores veem o ranking global, gerentes veem o ranking de sua equipe, corretores veem apenas o ranking de sua equipe.
+        </div>
+        
+        <div class="route">GET /api/gamification/company-summary</div>
+        <p>Fornece um resumo completo dos dados de gamificação da empresa, incluindo estatísticas por nível, conquistas e pontos.</p>
+        <div class="role-access">
+            <span class="role">Acesso:</span> Apenas diretores.
+        </div>
+        
+        <div class="route">GET /api/gamification/role-ranking?role=broker|manager</div>
+        <p>Retorna o ranking de usuários por tipo específico (gerentes ou corretores).</p>
+        <div class="role-access">
+            <span class="role">Acesso:</span> Diretores podem ver todos, gerentes podem ver apenas os corretores que gerenciam.
+        </div>
+        
+        <div class="route">GET /api/gamification/team-summary/:teamId</div>
+        <p>Mostra um resumo detalhado da gamificação para uma equipe específica.</p>
+        <div class="role-access">
+            <span class="role">Acesso:</span> Diretores podem ver todas as equipes, gerentes podem ver apenas suas equipes, corretores podem ver apenas a equipe a que pertencem.
+        </div>
+        
+        <div class="route">POST /api/gamification/test/add-points</div>
+        <p>Rota de teste para adicionar pontos manualmente a um usuário.</p>
+        <div class="role-access">
+            <span class="role">Acesso:</span> Apenas para testes, disponível para todos os usuários autenticados.
+        </div>
+    </div>
+    
+    <h2>Interfaces de Usuário</h2>
+    
+    <div class="card">
+        <p>Foram criados os seguintes componentes para a interface de usuário:</p>
+        <ul>
+            <li><strong>GamificationStatsCard</strong> - Exibe estatísticas de distribuição por níveis</li>
+            <li><strong>TeamRankingChart</strong> - Mostra comparação entre equipes</li>
+            <li><strong>RoleComparisonChart</strong> - Compara estatísticas entre gerentes e corretores</li>
+            <li><strong>GamificationLeaderboard</strong> - Exibe o ranking de usuários com detalhes</li>
+        </ul>
+        <p>O dashboard do diretor foi implementado com visualizações detalhadas de todas essas estatísticas.</p>
+    </div>
+    
+    <h2>Integração com o Sistema</h2>
+    
+    <div class="card">
+        <p>O sistema de gamificação está integrado com as funcionalidades existentes:</p>
+        <ul>
+            <li>Pontos são concedidos automaticamente quando atividades são completadas</li>
+            <li>Negociações que progridem de estágio geram pontos</li>
+            <li>Envio de mensagens e interações no sistema são recompensados</li>
+            <li>O progresso nas conquistas é atualizado automaticamente</li>
+            <li>Notificações são enviadas quando conquistas são desbloqueadas</li>
+        </ul>
+    </div>
+    
+    <div class="card">
+        <p>Para acessar a aplicação completa, seria necessário iniciar o servidor com <code>npm run dev</code>, mas devido a restrições de segurança no PowerShell, não é possível executar esse comando diretamente.</p>
+        <p>Esta página demonstrativa serve como um resumo das funcionalidades implementadas no sistema de gamificação.</p>
+    </div>
+</body>
+</html> 

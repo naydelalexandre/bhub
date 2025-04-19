@@ -3,7 +3,7 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // User schema
-export const userRoleEnum = pgEnum('user_role', ['manager', 'broker']);
+export const userRoleEnum = pgEnum('user_role', ['director', 'manager', 'broker']);
 
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -12,9 +12,19 @@ export const users = pgTable("users", {
   name: text("name").notNull(),
   role: userRoleEnum("role").notNull(),
   avatarInitials: text("avatar_initials").notNull(),
+  managerId: integer("manager_id"), // ID do gerente responsável (para corretores)
+  teamId: integer("team_id"),       // ID da equipe (para identificar membros da mesma equipe)
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({ id: true });
+
+// Team schema
+export const teams = pgTable("teams", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  managerId: integer("manager_id").notNull(), // ID do gerente responsável pela equipe
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
 
 // Activity schema
 export const activityStatusEnum = pgEnum('activity_status', ['pending', 'in_progress', 'completed']);
@@ -57,6 +67,7 @@ export const messages = pgTable("messages", {
   id: serial("id").primaryKey(),
   content: text("content").notNull(),
   senderId: integer("sender_id").notNull(),
+  // Um receiverId=0 é usado para identificar mensagens de equipe
   receiverId: integer("receiver_id").notNull(),
   read: boolean("read").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),

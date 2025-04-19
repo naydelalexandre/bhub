@@ -28,8 +28,6 @@ const createActivitySchema = z.object({
   description: z.string().optional(),
   assignedTo: z.number({ message: "Selecione um corretor" }),
   dueDate: z.string().min(1, { message: "Selecione uma data de vencimento" }),
-  clientName: z.string().optional(),
-  propertyInfo: z.string().optional(),
 });
 
 type CreateActivityFormValues = z.infer<typeof createActivitySchema>;
@@ -60,8 +58,6 @@ export default function ActivitiesCard({ activities, isLoading, userRole, classN
       description: "",
       assignedTo: 0,
       dueDate: "",
-      clientName: "",
-      propertyInfo: ""
     }
   });
 
@@ -125,36 +121,6 @@ export default function ActivitiesCard({ activities, isLoading, userRole, classN
                       </FormItem>
                     )}
                   />
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="clientName"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Cliente</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Nome do cliente" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    
-                    <FormField
-                      control={form.control}
-                      name="propertyInfo"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Imóvel</FormLabel>
-                          <FormControl>
-                            <Input placeholder="Informações do imóvel" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <FormField

@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrokerBooster Mobile - Sistema de Gamificação</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f4f8;
+        }
+        h1 {
+            color: #2196f3;
+            border-bottom: 2px solid #2196f3;
+            padding-bottom: 10px;
+            font-size: 28px;
+            text-align: center;
+        }
+        h2 {
+            color: #ff9800;
+            margin-top: 30px;
+            font-size: 22px;
+        }
+        h3 {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #555;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .mobile-preview {
+            background: #111;
+            width: 300px;
+            padding: 15px 12px;
+            border-radius: 32px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .screen {
+            background: #f8f9fa;
+            overflow-y: auto;
+            border-radius: 22px;
+            height: 530px;
+            width: 100%;
+        }
+        .notch {
+            position: absolute;
+            width: 150px;
+            height: 25px;
+            background: #111;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-bottom-left-radius: 15px;
+            border-bottom-right-radius: 15px;
+            z-index: 2;
+        }
+        .mobile-content {
+            padding: 16px;
+        }
+        .app-header {
+            padding: 15px;
+            background: #2196f3;
+            color: white;
+            border-top-left-radius: 22px;
+            border-top-right-radius: 22px;
+            position: relative;
+        }
+        .back-button {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            color: white;
+            font-weight: bold;
+        }
+        .app-title {
+            text-align: center;
+            font-weight: bold;
+            margin: 0;
+            font-size: 18px;
+        }
+        .nav-bar {
+            display: flex;
+            justify-content: space-around;
+            background: white;
+            padding: 12px 0;
+            border-top: 1px solid #eee;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            left: 0;
+        }
+        .nav-item {
+            text-align: center;
+            font-size: 12px;
+        }
+        .nav-icon {
+            font-size: 24px;
+            margin-bottom: 2px;
+        }
+        .stats-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .level-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        .bronze { background-color: #CD7F32; color: white; }
+        .silver { background-color: #C0C0C0; color: black; }
+        .gold { background-color: #FFD700; color: black; }
+        .platinum { background-color: #E5E4E2; color: black; }
+        .diamond { background-color: #B9F2FF; color: black; }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #4caf50;
+            border-radius: 5px;
+        }
+        .achievement {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .achievement-icon {
+            width: 40px;
+            height: 40px;
+            background: #e3f2fd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 20px;
+        }
+        .achievement-complete .achievement-icon {
+            background: #4caf50;
+            color: white;
+        }
+        .achievement-details {
+            flex: 1;
+        }
+        .achievement-title {
+            font-weight: bold;
+            font-size: 14px;
+            margin: 0;
+        }
+        .achievement-desc {
+            font-size: 12px;
+            color: #666;
+            margin: 2px 0 0 0;
+        }
+        .rank-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .rank-position {
+            font-weight: bold;
+            font-size: 16px;
+            width: 25px;
+        }
+        .rank-avatar {
+            width: 36px;
+            height: 36px;
+            background: #2196f3;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .rank-user {
+            flex: 1;
+        }
+        .rank-name {
+            font-weight: bold;
+            font-size: 14px;
+            margin: 0;
+        }
+        .rank-role {
+            font-size: 12px;
+            color: #666;
+            margin: 0;
+        }
+        .rank-points {
+            font-weight: bold;
+            color: #ff9800;
+        }
+        .top-3 .rank-position {
+            color: #f57c00;
+        }
+        .card-switcher {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .switcher-button {
+            border: none;
+            background: #f0f0f0;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .switcher-button.active {
+            background: #2196f3;
+            color: white;
+        }
+        .feature-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2196f3;
+        }
+        .feature-description {
+            margin-bottom: 25px;
+        }
+        .responsive-note {
+            background-color: #fffde7;
+            border-left: 4px solid #fbc02d;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>BrokerBooster Mobile - Sistema de Gamificação</h1>
+    
+    <div class="card">
+        <p>Visualização do sistema de gamificação do BrokerBooster em dispositivos móveis. Esta página demonstra como a interface se adaptaria para smartphones, mantendo todas as funcionalidades do sistema web.</p>
+        
+        <div class="responsive-note">
+            <strong>Nota:</strong> As telas abaixo são demonstrativas e representam como o sistema se comportaria em um dispositivo móvel. O layout se adapta automaticamente para oferecer a melhor experiência para os usuários em trânsito.
+        </div>
+    </div>
+    
+    <h2>Telas Principais do Aplicativo Mobile</h2>
+    
+    <div class="container">
+        <!-- Tela de Perfil de Gamificação -->
+        <div class="mobile-preview">
+            <div class="notch"></div>
+            <div class="screen">
+                <div class="app-header">
+                    <span class="back-button">←</span>
+                    <h2 class="app-title">Perfil de Gamificação</h2>
+                </div>
+                <div class="mobile-content">
+                    <div class="stats-card">
+                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                            <div style="background: #2196f3; color: white; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px; font-weight: bold;">JS</div>
+                            <div>
+                                <h3 style="margin: 0; font-size: 16px;">João Silva</h3>
+                                <span class="level-badge gold">Nível Gold</span>
+                            </div>
+                        </div>
+                        <p style="font-size: 14px; margin: 5px 0;">Progresso para Platinum:</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 65%;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 12px;">
+                            <span>1,250 pts</span>
+                            <span>2,000 pts para o próximo nível</span>
+                        </div>
+                        
+                        <div style="display: flex; justify-content: space-between; margin-top: 15px; text-align: center;">
+                            <div>
+                                <p style="margin: 0; font-size: 12px; color: #666;">Total</p>
+                                <p style="margin: 5px 0; font-weight: bold; font-size: 18px;">1,250</p>
+                            </div>
+                            <div>
+                                <p style="margin: 0; font-size: 12px; color: #666;">Semanal</p>
+                                <p style="margin: 5px 0; font-weight: bold; font-size: 18px;">187</p>
+                            </div>
+                            <div>
+                                <p style="margin: 0; font-size: 12px; color: #666;">Ranking</p>
+                                <p style="margin: 5px 0; font-weight: bold; font-size: 18px;">#3</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-switcher">
+                        <button class="switcher-button active">Conquistas</button>
+                        <button class="switcher-button">Histórico</button>
+                        <button class="switcher-button">Estatísticas</button>
+                    </div>
+                    
+                    <h3 style="margin: 10px 0; font-size: 15px;">Minhas Conquistas</h3>
+                    
+                    <div class="achievement achievement-complete">
+                        <div class="achievement-icon">✓</div>
+                        <div class="achievement-details">
+                            <p class="achievement-title">Primeira Atividade</p>
+                            <p class="achievement-desc">Complete sua primeira atividade</p>
+                        </div>
+                        <div style="font-size: 14px; color: #4caf50;">+50</div>
+                    </div>
+                    
+                    <div class="achievement achievement-complete">
+                        <div class="achievement-icon">✓</div>
+                        <div class="achievement-details">
+                            <p class="achievement-title">Comunicador</p>
+                            <p class="achievement-desc">Envie 10 mensagens para sua equipe</p>
+                        </div>
+                        <div style="font-size: 14px; color: #4caf50;">+75</div>
+                    </div>
+                    
+                    <div class="achievement">
+                        <div class="achievement-icon">🔄</div>
+                        <div class="achievement-details">
+                            <p class="achievement-title">Negociador Mestre</p>
+                            <p class="achievement-desc">Complete 5 negociações com sucesso</p>
+                        </div>
+                        <div>
+                            <span style="font-size: 12px;">3/5</span>
+                            <div class="progress-bar" style="width: 50px;">
+                                <div class="progress-fill" style="width: 60%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="achievement">
+                        <div class="achievement-icon">🔄</div>
+                        <div class="achievement-details">
+                            <p class="achievement-title">Persistente</p>
+                            <p class="achievement-desc">Login por 7 dias consecutivos</p>
+                        </div>
+                        <div>
+                            <span style="font-size: 12px;">5/7</span>
+                            <div class="progress-bar" style="width: 50px;">
+                                <div class="progress-fill" style="width: 71%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nav-bar">
+                    <div class="nav-item">
+                        <div class="nav-icon">🏠</div>
+                        <div>Home</div>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">📊</div>
+                        <div>Ranking</div>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">🏆</div>
+                        <div style="color: #2196f3;">Perfil</div>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">💬</div>
+                        <div>Chat</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tela de Ranking -->
+        <div class="mobile-preview">
+            <div class="notch"></div>
+            <div class="screen">
+                <div class="app-header">
+                    <span class="back-button">←</span>
+                    <h2 class="app-title">Ranking Semanal</h2>
+                </div>
+                <div class="mobile-content">
+                    <div class="card-switcher">
+                        <button class="switcher-button active">Equipe</button>
+                        <button class="switcher-button">Global</button>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; padding: 10px; background: #f5f5f5; border-radius: 8px; margin-bottom: 15px;">
+                        <div>
+                            <p style="margin: 0; font-size: 12px; color: #666;">Semana atual</p>
+                            <p style="margin: 0; font-weight: bold;">15-21 Abril</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="margin: 0; font-size: 12px; color: #666;">Atualizado</p>
+                            <p style="margin: 0;">Há 20 min</p>
+                        </div>
+                    </div>
+                    
+                    <div class="rank-item top-3">
+                        <div class="rank-position">1</div>
+                        <div class="rank-avatar" style="background: #ffd700; color: #000;">MS</div>
+                        <div class="rank-user">
+                            <p class="rank-name">Maria Silva</p>
+                            <p class="rank-role">Corretor • <span style="color: #ffd700;">Gold</span></p>
+                        </div>
+                        <div class="rank-points">245 pts</div>
+                    </div>
+                    
+                    <div class="rank-item top-3">
+                        <div class="rank-position">2</div>
+                        <div class="rank-avatar" style="background: #c0c0c0; color: #000;">RS</div>
+                        <div class="rank-user">
+                            <p class="rank-name">Ricardo Santos</p>
+                            <p class="rank-role">Corretor • <span style="color: #ffd700;">Gold</span></p>
+                        </div>
+                        <div class="rank-points">218 pts</div>
+                    </div>
+                    
+                    <div class="rank-item top-3" style="background: #e3f2fd;">
+                        <div class="rank-position">3</div>
+                        <div class="rank-avatar">JS</div>
+                        <div class="rank-user">
+                            <p class="rank-name">João Silva</p>
+                            <p class="rank-role">Corretor • <span style="color: #ffd700;">Gold</span></p>
+                        </div>
+                        <div class="rank-points">187 pts</div>
+                    </div>
+                    
+                    <div class="rank-item">
+                        <div class="rank-position">4</div>
+                        <div class="rank-avatar">LM</div>
+                        <div class="rank-user">
+                            <p class="rank-name">Lúcia Moreira</p>
+                            <p class="rank-role">Corretor • <span style="color: #C0C0C0;">Silver</span></p>
+                        </div>
+                        <div class="rank-points">156 pts</div>
+                    </div>
+                    
+                    <div class="rank-item">
+                        <div class="rank-position">5</div>
+                        <div class="rank-avatar">PF</div>
+                        <div class="rank-user">
+                            <p class="rank-name">Paulo Fernandes</p>
+                            <p class="rank-role">Corretor • <span style="color: #C0C0C0;">Silver</span></p>
+                        </div>
+                        <div class="rank-points">143 pts</div>
+                    </div>
+                    
+                    <div class="rank-item">
+                        <div class="rank-position">6</div>
+                        <div class="rank-avatar">CM</div>
+                        <div class="rank-user">
+                            <p class="rank-name">Carla Mendes</p>
+                            <p class="rank-role">Corretor • <span style="color: #C0C0C0;">Silver</span></p>
+                        </div>
+                        <div class="rank-points">121 pts</div>
+                    </div>
+                </div>
+                
+                <div class="nav-bar">
+                    <div class="nav-item">
+                        <div class="nav-icon">🏠</div>
+                        <div>Home</div>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">📊</div>
+                        <div style="color: #2196f3;">Ranking</div>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">🏆</div>
+                        <div>Perfil</div>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">💬</div>
+                        <div>Chat</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tela de Conquistas -->
+        <div class="mobile-preview">
+            <div class="notch"></div>
+            <div class="screen">
+                <div class="app-header">
+                    <span class="back-button">←</span>
+                    <h2 class="app-title">Conquistas</h2>
+                </div>
+                <div class="mobile-content">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                        <div>
+                            <p style="margin: 0; font-size: 14px;">Suas conquistas</p>
+                            <p style="margin: 0; font-weight: bold;">12 de 25 completadas</p>
+                        </div>
+                        <div style="background: #e3f2fd; border-radius: 20px; padding: 6px 15px;">
+                            <span style="font-weight: bold;">48%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-switcher">
+                        <button class="switcher-button active">Todos</button>
+                        <button class="switcher-button">Completos</button>
+                        <button class="switcher-button">Em progresso</button>
+                    </div>
+                    
+                    <div style="margin: 15px 0; font-weight: bold; color: #666;">Atividades</div>
+                    
+                    <div class="achievement achievement-complete">
+                        <div class="achievement-icon">✓</div>
+                        <div class="achievement-details">
+                            <p class="achievement-title">Primeira Atividade</p>
+                            <p class="achievement-desc">Complete sua primeira atividade</p>
+                        </div>
+                        <div style="font-size: 14px; color: #4caf50;">+50</div>
+                    </div>
+                    
+                    <div class="achievement achievement-complete">
+                        <div class="achievement-icon">✓</div>
+                        <div class="achievement-details">
+                            <p class="achievement-title">Produtivo</p>
+                            <p class="achievement-desc">Complete 5 atividades em uma semana</p>
+                        </div>
+                        <div style="font-size: 14px; color: #4caf50;">+75</div>
+                    </div>
+                    
+                    <div class="achievement">
+                        <div class="achievement-icon">🔄</div>
+                        <div class="achievement-details">
+                            <p class="achievement-title">Supereficiente</p>
+                            <p class="achievement-desc">Complete 10 atividades em uma semana</p>
+                        </div>
+                        <div>
+                            <span style="font-size: 12px;">7/10</span>
+                            <div class="progress-bar" style="width: 50px;">
+                                <div class="progress-fill" style="width: 70%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 15px 0; font-weight: bold; color: #666;">Negociações</div>
+                    
+                    <div class="achievement achievement-complete">
+                        <div class="achievement-icon">✓</div>
+                        <div class="achievement-details">
+                            <p class="achievement-title">Primeiro Negócio</p>
+                            <p class="achievement-desc">Feche seu primeiro negócio</p>
+                        </div>
+                        <div style="font-size: 14px; color: #4caf50;">+100</div>
+                    </div>
+                    
+                    <div class="achievement">
+                        <div class="achievement-icon">🔄</div>
+                        <div class="achievement-details">
+                            <p class="achievement-title">Negociador Mestre</p>
+                            <p class="achievement-desc">Complete 5 negociações com sucesso</p>
+                        </div>
+                        <div>
+                            <span style="font-size: 12px;">3/5</span>
+                            <div class="progress-bar" style="width: 50px;">
+                                <div class="progress-fill" style="width: 60%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nav-bar">
+                    <div class="nav-item">
+                        <div class="nav-icon">🏠</div>
+                        <div>Home</div>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">📊</div>
+                        <div>Ranking</div>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">🏆</div>
+                        <div style="color: #2196f3;">Perfil</div>
+                    </div>
+                    <div class="nav-item">
+                        <div class="nav-icon">💬</div>
+                        <div>Chat</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <h2>Adaptações para Mobile</h2>
+    
+    <div class="card">
+        <div class="feature-title">1. Interface Simplificada</div>
+        <div class="feature-description">
+            <p>A interface mobile foi otimizada para telas menores com foco em:</p>
+            <ul>
+                <li>Cartões compactos que exibem informações essenciais</li>
+                <li>Navegação por abas simplificada para alternar entre visualizações</li>
+                <li>Menu de navegação inferior para acesso rápido às funções principais</li>
+                <li>Botões maiores e áreas de toque ampliadas para melhor usabilidade</li>
+            </ul>
+        </div>
+        
+        <div class="feature-title">2. Sincronização em Tempo Real</div>
+        <div class="feature-description">
+            <p>A versão mobile mantém sincronização constante com o sistema web:</p>
+            <ul>
+                <li>Pontos e conquistas desbloqueadas são atualizados instantaneamente</li>
+                <li>Notificações push para novas conquistas e mudanças no ranking</li>
+                <li>Progresso sincronizado entre dispositivos móveis e desktop</li>
+            </ul>
+        </div>
+        
+        <div class="feature-title">3. Funcionalidades Offline</div>
+        <div class="feature-description">
+            <p>Para usuários em trânsito com conectividade limitada:</p>
+            <ul>
+                <li>Armazenamento local de dados do perfil e conquistas para visualização offline</li>
+                <li>Fila de ações para sincronizar quando a conexão for restabelecida</li>
+                <li>Indicador visual de status online/offline</li>
+            </ul>
+        </div>
+        
+        <div class="feature-title">4. Otimizações de Performance</div>
+        <div class="feature-description">
+            <p>A versão mobile foi otimizada para consumo reduzido de recursos:</p>
+            <ul>
+                <li>Carregamento sob demanda para listas longas (ranking, histórico)</li>
+                <li>Compressão de dados para reduzir uso de banda</li>
+                <li>Cache inteligente para minimizar requisições ao servidor</li>
+                <li>Consumo otimizado de bateria durante uso prolongado</li>
+            </ul>
+        </div>
+    </div>
+    
+    <div class="card">
+        <p>A interface mobile do BrokerBooster mantém todas as funcionalidades do sistema web de gamificação, adaptadas para oferecer a melhor experiência em dispositivos móveis. Isso permite que corretores, gerentes e diretores acompanhem seu progresso e compitam mesmo quando estão em movimento.</p>
+        
+        <p>Para acessar a aplicação completa, seria necessária a criação de um aplicativo nativo ou web responsivo utilizando tecnologias como React Native ou Flutter, que permitiriam uma experiência verdadeiramente móvel com acesso a recursos nativos como notificações push.</p>
+    </div>
+</body>
+</html> 

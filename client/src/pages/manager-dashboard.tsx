@@ -1,21 +1,26 @@
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import DashboardHeader from "@/components/layouts/dashboard-header";
 import StatCard from "@/components/dashboard/stat-card";
 import PerformanceCard from "@/components/dashboard/performance-card";
-import PerformanceChart from "@/components/dashboard/performance-chart";
+import EnhancedPerformanceChart from "@/components/dashboard/enhanced-performance-chart";
 import ActivitiesCard from "@/components/dashboard/activities-card";
 import NegotiationsCard from "@/components/dashboard/negotiations-card";
 import NotificationsCard from "@/components/dashboard/notifications-card";
+import TeamChat from "@/components/chat/team-chat";
 import { WebSocketProvider } from "@/lib/websocket";
-import { Activity, Deal, Notification } from "@shared/schema";
-import { Loader2 } from "lucide-react";
+import { Activity, Deal, Notification, Performance } from "@shared/schema";
+import { Loader2, MessageCircle, MessageSquare, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { convertPerformancesToPerformerProps } from "@/components/dashboard/performance-converter";
 
 export default function ManagerDashboard() {
   const { user, isLoading } = useAuth();
   const [, navigate] = useLocation();
+  const [chatOpen, setChatOpen] = useState(false);
   
   // Redirect if not authenticated or not a manager
   useEffect(() => {
@@ -54,7 +59,7 @@ export default function ManagerDashboard() {
     queryKey: ["/api/notifications"],
   });
 
-  const { data: performances, isLoading: isPerformancesLoading } = useQuery({
+  const { data: performances, isLoading: isPerformancesLoading } = useQuery<Performance[]>({
     queryKey: ["/api/performance"],
   });
 
@@ -63,14 +68,17 @@ export default function ManagerDashboard() {
   const totalActivities = activities?.length || 0;
   const activeDeals = deals?.length || 0;
   const conversionRate = activeDeals > 0 ? Math.floor((activeDeals / (activeDeals + 5)) * 100) : 0;
-  const averagePerformance = performances?.length > 0 
-    ? Math.floor(performances.reduce((sum, p) => sum + p.score, 0) / performances.length) 
+  const averagePerformance = performances && performances.length > 0
+    ? Math.floor(performances.reduce((sum, p) => sum + p.score, 0) / performances.length)
     : 0;
   const weeklyGrowth = "+3.2%"; // In a real app, this would be calculated based on historical data
 
+  // Converter as performances para o formato esperado pelo PerformanceCard
+  const performersProps = performances ? convertPerformancesToPerformerProps(performances) : [];
+
   return (
     <WebSocketProvider userId={user.id}>
-      <div className="min-h-screen bg-neutral-50">
+      <div className="min-h-screen bg-neutral-50 pb-16 md:pb-0 relative">
         <DashboardHeader 
           title="Dashboard do Gestor" 
           user={{
@@ -129,12 +137,13 @@ export default function ManagerDashboard() {
             />
           </div>
           
-          {/* Data Visualization Chart */}
+          {/* Enhanced Performance Chart */}
           <div className="mb-6">
-            <PerformanceChart 
+            <EnhancedPerformanceChart 
               activities={activities || []}
               deals={deals || []}
-              isLoading={isActivitiesLoading || isDealsLoading}
+              performances={performances || []}
+              isLoading={isActivitiesLoading || isDealsLoading || isPerformancesLoading}
             />
           </div>
           
@@ -142,7 +151,7 @@ export default function ManagerDashboard() {
             <div className="lg:col-span-2">
               {/* Performance Card */}
               <PerformanceCard 
-                performances={performances || []}
+                performances={performersProps}
                 isLoading={isPerformancesLoading} 
                 className="mb-6"
               />
@@ -172,6 +181,36 @@ export default function ManagerDashboard() {
             </div>
           </div>
         </main>
+        
+        {/* Mobile Chat Button */}
+        <div className="md:hidden fixed bottom-4 right-4 z-10">
+          <Button 
+            onClick={() => setChatOpen(true)}
+            className="h-14 w-14 rounded-full bg-primary shadow-lg flex justify-center items-center"
+          >
+            <MessageCircle className="h-6 w-6 text-white" />
+          </Button>
+        </div>
+        
+        {/* Mobile Chat Drawer */}
+        <Drawer open={chatOpen} onOpenChange={setChatOpen}>
+          <DrawerContent className="h-[90vh]">
+            <div className="h-full p-4">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-lg font-semibold">Chat da Equipe</h2>
+                <Button variant="ghost" size="icon" onClick={() => setChatOpen(false)}>
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
+              <TeamChat currentUser={user} className="h-[calc(100%-50px)]" />
+            </div>
+          </DrawerContent>
+        </Drawer>
+        
+        {/* Desktop Chat */}
+        <div className="hidden md:block fixed right-4 bottom-4 w-[350px] h-[500px] shadow-xl rounded-lg overflow-hidden border border-neutral-200 z-10">
+          <TeamChat currentUser={user} />
+        </div>
       </div>
     </WebSocketProvider>
   );

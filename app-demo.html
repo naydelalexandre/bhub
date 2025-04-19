@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrokerBooster - Demo</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f4f8;
+        }
+        h1 {
+            color: #2196f3;
+            border-bottom: 2px solid #2196f3;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        .options {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 40px;
+        }
+        .option-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 25px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+        .option-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        .option-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2196f3;
+        }
+        .option-desc {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .btn {
+            display: inline-block;
+            background-color: #2196f3;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #1976d2;
+        }
+        .intro {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .note {
+            background-color: #fffde7;
+            border-left: 4px solid #fbc02d;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>BrokerBooster - Sistema de Gamificação</h1>
+    
+    <div class="intro">
+        <p>Bem-vindo à demonstração do Sistema de Gamificação do BrokerBooster! Esta página fornece acesso a duas visualizações do sistema que implementamos.</p>
+        
+        <div class="note">
+            <strong>Nota:</strong> Para acessar qualquer uma das visualizações, basta clicar nos botões abaixo. Cada link abrirá em uma nova aba para facilitar a navegação.
+        </div>
+    </div>
+    
+    <div class="options">
+        <div class="option-card">
+            <div class="option-icon">🖥️</div>
+            <div class="option-title">Visão Web</div>
+            <div class="option-desc">
+                Explore a versão web completa do sistema de gamificação, incluindo todas as funcionalidades e rotas implementadas para corretores, gerentes e diretores.
+            </div>
+            <a href="demo.html" target="_blank" class="btn">Acessar Visão Web</a>
+        </div>
+        
+        <div class="option-card">
+            <div class="option-icon">📱</div>
+            <div class="option-title">Visão Mobile</div>
+            <div class="option-desc">
+                Veja como o sistema se adapta para dispositivos móveis, com interface otimizada para telas menores e funcionalidades adaptadas.
+            </div>
+            <a href="mobile-view.html" target="_blank" class="btn">Acessar Visão Mobile</a>
+        </div>
+    </div>
+    
+    <div class="note" style="margin-top: 30px;">
+        <p><strong>Importante:</strong> Esta é uma demonstração visual do sistema. Para interagir com todas as funcionalidades em um ambiente de produção, seria necessário iniciar o servidor com <code>npm run dev</code> e configurar corretamente o ambiente de desenvolvimento.</p>
+    </div>
+</body>
+</html> 

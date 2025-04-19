@@ -4,7 +4,25 @@ import { storage } from "./storage";
 import { setupAuth } from "./auth";
 import { setupWebsocket } from "./websocket";
 import { z } from "zod";
-import { insertActivitySchema, insertDealSchema, insertMessageSchema, insertNotificationSchema } from "@shared/schema";
+import { User, insertActivitySchema, insertDealSchema, insertMessageSchema, insertNotificationSchema } from "@shared/schema";
+import gamificationRoutes from './routes/gamification';
+import { Permission, requirePermission, canAccessResource } from './middleware/permission';
+
+// Adicionar a tipagem correta para Express.User
+declare global {
+  namespace Express {
+    interface User {
+      id: number;
+      name: string;
+      role: 'director' | 'manager' | 'broker';
+      avatarInitials: string;
+      username: string;
+      password: string;
+      teamId?: number; // Adicionar campo opcional para teamId
+      managerId?: number; // Adicionar campo opcional para managerId
+    }
+  }
+}
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Set up authentication
@@ -12,22 +30,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // API routes
   // Activities
-  app.get("/api/activities", async (req, res) => {
+  app.get("/api/activities", authenticateUser, async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Unauthorized");
     
-    const user = req.user;
+    const user = req.user!;
     let activities;
     
-    if (user.role === "manager") {
+    if (user.role === "director") {
+      // Diretores veem todas as atividades
+      activities = await storage.getAllActivities();
+    } else if (user.role === "manager") {
+      // Gerentes veem atividades criadas por eles (para sua equipe)
       activities = await storage.getActivitiesByManager(user.id);
     } else {
+      // Corretores veem apenas suas próprias atividades
       activities = await storage.getActivitiesByUser(user.id);
     }
     
     res.json(activities);
   });
 
-  app.get("/api/activities/:id", async (req, res) => {
+  app.get("/api/activities/:id", authenticateUser, async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Unauthorized");
     
     const id = parseInt(req.params.id);
@@ -37,12 +60,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(404).send("Activity not found");
     }
     
-    const user = req.user;
-    if (user.role !== "manager" && activity.assignedTo !== user.id) {
-      return res.status(403).send("Forbidden");
+    const user = req.user!;
+    // Diretores podem ver todas as atividades
+    if (user.role === "director") {
+      return res.json(activity);
     }
     
-    res.json(activity);
+    // Gerentes podem ver atividades que criaram
+    if (user.role === "manager" && activity.createdBy === user.id) {
+      return res.json(activity);
+    }
+    
+    // Corretores só podem ver atividades atribuídas a eles
+    if (activity.assignedTo === user.id) {
+      return res.json(activity);
+    }
+    
+    return res.status(403).send("Forbidden");
   });
 
   app.post("/api/activities", async (req, res) => {
@@ -88,7 +122,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(404).send("Activity not found");
     }
     
-    const user = req.user;
+    const user = req.user!;
     if (user.role !== "manager" && activity.assignedTo !== user.id) {
       return res.status(403).send("Forbidden");
     }
@@ -138,6 +172,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Se o status está sendo alterado para "completed", registrar na gamificação
+      if (req.body.status === "completed" && activity.status !== "completed") {
+        try {
+          const { gamificationService } = await import('./gamification-service');
+          // Verificar se a atividade foi completada antes do prazo
+          const isTimely = new Date() < new Date(activity.dueDate);
+          await gamificationService.onActivityCompleted(req.user!.id, activity.id, isTimely);
+        } catch (gamificationError) {
+          console.log('Gamificação não disponível ou erro:', gamificationError);
+        }
+      }
+      
       res.json(updatedActivity);
     } catch (error) {
       res.status(500).send("Server error");
@@ -148,7 +194,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/deals", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Unauthorized");
     
-    const user = req.user;
+    const user = req.user!;
     let deals;
     
     if (user.role === "manager") {
@@ -170,7 +216,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(404).send("Deal not found");
     }
     
-    const user = req.user;
+    const user = req.user!;
     if (user.role !== "manager" && deal.assignedTo !== user.id) {
       return res.status(403).send("Forbidden");
     }
@@ -221,7 +267,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(404).send("Deal not found");
     }
     
-    const user = req.user;
+    const user = req.user!;
     if (user.role !== "manager" && deal.assignedTo !== user.id) {
       return res.status(403).send("Forbidden");
     }
@@ -272,6 +318,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         });
       }
       
+      // Se o estágio está sendo alterado, registrar na gamificação
+      if (req.body.stage && req.body.stage !== deal.stage) {
+        try {
+          const { gamificationService } = await import('./gamification-service');
+          await gamificationService.onDealProgressed(req.user!.id, deal.id, deal.stage, req.body.stage);
+        } catch (gamificationError) {
+          console.log('Gamificação não disponível ou erro:', gamificationError);
+        }
+      }
+      
       res.json(updatedDeal);
     } catch (error) {
       res.status(500).send("Server error");
@@ -282,10 +338,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/messages/:userId", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Unauthorized");
     
-    const currentUserId = req.user.id;
-    const otherUserId = parseInt(req.params.userId);
+    const userId = parseInt(req.params.userId);
+    const currentUser = req.user!;
     
-    const messages = await storage.getMessagesBetweenUsers(currentUserId, otherUserId);
+    // Get messages between current user and the specified user
+    const messages = await storage.getMessagesBetweenUsers(currentUser.id, userId);
+    
+    // Mark all received messages as read
+    for (const message of messages) {
+      if (message.receiverId === currentUser.id && !message.read) {
+        await storage.markMessageAsRead(message.id);
+      }
+    }
+    
+    res.json(messages);
+  });
+  
+  // New endpoint for team messages
+  app.get("/api/messages/team", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Unauthorized");
+    
+    const messages = await storage.getTeamMessages();
+    
+    // Mark all team messages as read for the current user
+    for (const message of messages) {
+      if (message.receiverId === 0 && !message.read) { // receiverId 0 indicates team message
+        await storage.markMessageAsReadForUser(message.id, req.user.id);
+      }
+    }
+    
     res.json(messages);
   });
 
@@ -314,6 +395,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ errors: error.errors });
       }
+      res.status(500).send("Server error");
+    }
+  });
+  
+  // New endpoint for team messages
+  app.post("/api/messages/team", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Unauthorized");
+    
+    try {
+      const { content, senderId } = req.body;
+      
+      if (!content) {
+        return res.status(400).json({ error: "Content is required" });
+      }
+      
+      // Create team message (receiverId 0 indicates team message)
+      const message = await storage.createTeamMessage({
+        content,
+        senderId: req.user!.id,
+        receiverId: 0 // Special value for team messages
+      });
+      
+      // Get all team members to send notifications to
+      const teamMembers = req.user!.role === "manager" 
+        ? await storage.getUsersByRole("broker") 
+        : await storage.getUsersByRole("manager");
+      
+      // Create notifications for all team members except the sender
+      for (const member of teamMembers) {
+        if (member.id !== req.user!.id) {
+          await storage.createNotification({
+            type: "message",
+            title: "Nova mensagem da equipe",
+            content: `Nova mensagem de ${req.user!.name} para a equipe`,
+            userId: member.id,
+            relatedId: message.id,
+            relatedType: "team_message"
+          });
+        }
+      }
+      
+      // Registrar pontos de gamificação pelo envio de mensagem para a equipe
+      try {
+        // Apenas adiciona pontos se o serviço de gamificação estiver disponível
+        const { gamificationService } = await import('./gamification-service');
+        await gamificationService.onMessageSent(req.user!.id);
+      } catch (gamificationError) {
+        console.log('Gamificação não disponível ou erro:', gamificationError);
+        // Não interrompe o fluxo principal se houver erro na gamificação
+      }
+      
+      res.status(201).json(message);
+    } catch (error) {
       res.status(500).send("Server error");
     }
   });
@@ -355,9 +489,60 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/performance", async (req, res) => {
     if (!req.isAuthenticated()) return res.status(401).send("Unauthorized");
     
-    const user = req.user;
+    const user = req.user!;
     
-    if (user.role === "manager") {
+    if (user?.role === "director") {
+      try {
+        // Visão para diretoria: resumo geral da empresa
+        // 1. Total de gestores
+        const managers = await storage.getUsersByRole("manager");
+        
+        // 2. Total de corretores
+        const brokers = await storage.getUsersByRole("broker");
+        
+        // 3. Total de atividades
+        const activities = await storage.getAllActivities();
+        const activitiesCompleted = activities.filter(a => a.status === "completed");
+        const activitiesPending = activities.filter(a => a.status === "pending");
+        const activitiesInProgress = activities.filter(a => a.status === "in_progress");
+        
+        // 4. Total de negociações
+        const deals = await storage.getAllDeals();
+        const dealStages = {
+          initialContact: deals.filter(d => d.stage === "initial_contact").length,
+          visit: deals.filter(d => d.stage === "visit").length,
+          proposal: deals.filter(d => d.stage === "proposal").length,
+          closing: deals.filter(d => d.stage === "closing").length
+        };
+        
+        // Resumo geral para diretoria
+        const summary = {
+          managersCount: managers.length,
+          brokersCount: brokers.length,
+          activities: {
+            total: activities.length,
+            completed: activitiesCompleted.length,
+            pending: activitiesPending.length,
+            inProgress: activitiesInProgress.length,
+            completionRate: activities.length > 0 
+              ? Math.round((activitiesCompleted.length / activities.length) * 100) 
+              : 0
+          },
+          deals: {
+            total: deals.length,
+            stages: dealStages,
+            closingRate: deals.length > 0 
+              ? Math.round((dealStages.closing / deals.length) * 100) 
+              : 0
+          }
+        };
+        
+        res.json(summary);
+      } catch (error) {
+        console.error("Erro ao obter visão da diretoria:", error);
+        res.status(500).send("Server error");
+      }
+    } else if (user?.role === "manager") {
       // Get all brokers
       const brokers = await storage.getUsersByRole("broker");
       
@@ -391,6 +576,215 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(performance);
     }
   });
+
+  // Teams
+  app.get("/api/teams", authenticateUser, async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Unauthorized");
+    
+    const user = req.user!;
+    let teams = [];
+    
+    if (user.role === "director") {
+      // Diretores veem todas as equipes
+      teams = Array.from((await storage.getAllTeams()).values());
+    } else if (user.role === "manager") {
+      // Gerentes veem apenas as equipes que gerenciam
+      const team = await storage.getTeamByManager(user.id);
+      if (team) teams = [team];
+    } else {
+      // Corretores veem apenas a equipe a que pertencem
+      if (user.teamId) {
+        const team = await storage.getTeam(user.teamId);
+        if (team) teams = [team];
+      }
+    }
+    
+    res.json(teams);
+  });
+  
+  app.get("/api/teams/:id", authenticateUser, async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Unauthorized");
+    
+    const teamId = parseInt(req.params.id);
+    const team = await storage.getTeam(teamId);
+    
+    if (!team) {
+      return res.status(404).send("Team not found");
+    }
+    
+    const user = req.user!;
+    
+    // Diretores podem ver todas as equipes
+    if (user.role === "director") {
+      return res.json(team);
+    }
+    
+    // Gerentes podem ver equipes que gerenciam
+    if (user.role === "manager" && team.managerId === user.id) {
+      return res.json(team);
+    }
+    
+    // Corretores podem ver apenas a equipe a que pertencem
+    if (user.teamId === teamId) {
+      return res.json(team);
+    }
+    
+    return res.status(403).send("Forbidden");
+  });
+  
+  app.get("/api/teams/:id/members", authenticateUser, async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Unauthorized");
+    
+    const teamId = parseInt(req.params.id);
+    const team = await storage.getTeam(teamId);
+    
+    if (!team) {
+      return res.status(404).send("Team not found");
+    }
+    
+    const user = req.user!;
+    
+    // Diretores podem ver membros de todas as equipes
+    if (user.role === "director") {
+      // Continuar
+    } 
+    // Gerentes podem ver membros de equipes que gerenciam
+    else if (user.role === "manager" && team.managerId === user.id) {
+      // Continuar
+    }
+    // Corretores podem ver membros apenas da equipe a que pertencem
+    else if (user.teamId === teamId) {
+      // Continuar
+    }
+    else {
+      return res.status(403).send("Forbidden");
+    }
+    
+    const members = await storage.getUsersByTeam(teamId);
+    
+    // Remover dados sensíveis
+    const safeMembers = members.map(({ password, ...member }) => member);
+    
+    res.json(safeMembers);
+  });
+
+  // Users
+  app.get("/api/users/brokers", authenticateUser, async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Unauthorized");
+    
+    if (req.user?.role !== "manager" && req.user?.role !== "director") {
+      return res.status(403).send("Only managers and directors can view all brokers");
+    }
+    
+    let brokers;
+    
+    if (req.user?.role === "director") {
+      // Diretores veem todos os corretores
+      brokers = await storage.getUsersByRole("broker");
+    } else {
+      // Gerentes veem apenas os corretores de sua equipe
+      brokers = await storage.getBrokersByManager(req.user!.id);
+    }
+    
+    // Remove sensitive data like passwords
+    const safeBrokers = brokers.map(({ password, ...broker }) => broker);
+    
+    res.json(safeBrokers);
+  });
+  
+  app.get("/api/users/managers", authenticateUser, async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Unauthorized");
+    
+    if (req.user?.role !== "broker" && req.user?.role !== "director") {
+      return res.status(403).send("Only brokers and directors can view managers");
+    }
+    
+    let managers;
+    
+    if (req.user?.role === "director") {
+      // Diretores veem todos os gerentes
+      managers = await storage.getUsersByRole("manager");
+    } else {
+      // Corretores veem apenas seu próprio gerente
+      const brokerId = req.user!.id;
+      const broker = await storage.getUser(brokerId);
+      
+      if (broker?.managerId) {
+        const manager = await storage.getUser(broker.managerId);
+        managers = manager ? [manager] : [];
+      } else if (broker?.teamId) {
+        const team = await storage.getTeam(broker.teamId);
+        if (team?.managerId) {
+          const manager = await storage.getUser(team.managerId);
+          managers = manager ? [manager] : [];
+        } else {
+          managers = [];
+        }
+      } else {
+        managers = [];
+      }
+    }
+    
+    // Remove sensitive data like passwords
+    const safeManagers = managers.map(({ password, ...manager }) => manager);
+    
+    res.json(safeManagers);
+  });
+
+  // Nova rota para listar todos os gestores para a diretoria
+  app.get("/api/users/managers-ranking", async (req, res) => {
+    if (!req.isAuthenticated()) return res.status(401).send("Unauthorized");
+    
+    if (req.user?.role !== "director") {
+      return res.status(403).send("Only directors can view manager rankings");
+    }
+    
+    try {
+      // Obter todos os gestores
+      const managers = await storage.getUsersByRole("manager");
+      
+      // Para cada gestor, calcular métricas de desempenho
+      const managersPerformance = await Promise.all(managers.map(async (manager) => {
+        // Obter corretores sob gestão deste gerente
+        const brokersUnderManager = await storage.getBrokersByManager(manager.id);
+        
+        // Obter atividades criadas pelo gestor
+        const activities = await storage.getActivitiesByManager(manager.id);
+        const completedActivities = activities.filter(a => a.status === "completed");
+        
+        // Obter negócios iniciados pelo gestor
+        const deals = await storage.getDealsByManager(manager.id);
+        const closedDeals = deals.filter(d => d.stage === "closing");
+        
+        // Calcular pontuação baseada em atividades completadas e negócios fechados
+        const score = (completedActivities.length * 5) + (closedDeals.length * 15);
+        
+        // Retornar dados de desempenho do gestor
+        return {
+          id: manager.id,
+          name: manager.name,
+          avatarInitials: manager.avatarInitials,
+          brokerCount: brokersUnderManager.length,
+          activitiesCreated: activities.length,
+          activitiesCompleted: completedActivities.length,
+          dealsCreated: deals.length,
+          dealsCompleted: closedDeals.length,
+          score: score
+        };
+      }));
+      
+      // Ordenar gestores por pontuação
+      const rankedManagers = managersPerformance.sort((a, b) => b.score - a.score);
+      
+      res.json(rankedManagers);
+    } catch (error) {
+      console.error("Erro ao obter ranking de gestores:", error);
+      res.status(500).send("Server error");
+    }
+  });
+
+  // Adicionar rotas de gamificação
+  app.use('/api/gamification', gamificationRoutes);
 
   // Create HTTP server
   const httpServer = createServer(app);

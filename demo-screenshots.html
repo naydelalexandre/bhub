@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrokerBooster - Exemplos Visuais de Gamificação</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f8f9fa;
+        }
+        h1 {
+            color: #0056b3;
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #0056b3;
+            padding-bottom: 10px;
+        }
+        .example {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #0056b3;
+            margin-top: 0;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 10px;
+        }
+        .mockup {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+        }
+        .profile {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .avatar {
+            width: 80px;
+            height: 80px;
+            background-color: #0056b3;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .user-info {
+            flex-grow: 1;
+        }
+        .username {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0;
+        }
+        .level {
+            font-size: 18px;
+            color: #6c757d;
+            margin: 0;
+        }
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .stat-card {
+            background-color: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            flex: 1;
+            min-width: 120px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .stat-title {
+            color: #6c757d;
+            font-size: 14px;
+            margin: 0;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 5px 0 0 0;
+            color: #0056b3;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            height: 20px;
+            margin: 15px 0;
+        }
+        .progress-bar {
+            height: 100%;
+            border-radius: 10px;
+            background-color: #0056b3;
+            transition: width 0.5s;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .progress-label {
+            font-size: 14px;
+            color: #6c757d;
+            text-align: right;
+        }
+        .achievement {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            transition: transform 0.2s;
+        }
+        .achievement:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .achievement-icon {
+            width: 50px;
+            height: 50px;
+            background-color: #6c757d;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .achievement-completed .achievement-icon {
+            background-color: #28a745;
+        }
+        .achievement-info {
+            flex-grow: 1;
+        }
+        .achievement-title {
+            font-weight: bold;
+            margin: 0;
+        }
+        .achievement-description {
+            color: #6c757d;
+            margin: 5px 0 0 0;
+            font-size: 14px;
+        }
+        .achievement-progress {
+            width: 100px;
+        }
+        .leaderboard {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .leaderboard th, .leaderboard td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .leaderboard th {
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+        .leaderboard tr:hover {
+            background-color: #f8f9fa;
+        }
+        .rank {
+            font-weight: bold;
+            color: #0056b3;
+        }
+        .first {
+            color: #ffc107;
+        }
+        .second {
+            color: #adb5bd;
+        }
+        .third {
+            color: #cd7f32;
+        }
+        .timeline {
+            margin-top: 20px;
+        }
+        .timeline-item {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .timeline-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #0056b3;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        .timeline-content {
+            background-color: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            flex-grow: 1;
+            position: relative;
+        }
+        .timeline-content:before {
+            content: "";
+            position: absolute;
+            left: -10px;
+            top: 15px;
+            width: 0;
+            height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 10px solid white;
+        }
+        .timeline-date {
+            color: #6c757d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        .tab-container {
+            margin-top: 20px;
+        }
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+        }
+        .tab {
+            padding: 10px 20px;
+            background-color: #e9ecef;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+        }
+        .tab.active {
+            background-color: white;
+            border: 1px solid #dee2e6;
+            border-bottom: none;
+        }
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            border: 1px solid #dee2e6;
+            border-radius: 0 8px 8px 8px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .pill {
+            padding: 5px 15px;
+            background-color: #e9ecef;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #495057;
+        }
+        .pill.active {
+            background-color: #0056b3;
+            color: white;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+        }
+        .badge-bronze {
+            background-color: #cd7f32;
+        }
+        .badge-silver {
+            background-color: #a9a9a9;
+        }
+        .badge-gold {
+            background-color: #ffd700;
+            color: #333;
+        }
+        .badge-platinum {
+            background-color: #e5e4e2;
+            color: #333;
+        }
+        .badge-diamond {
+            background-color: #b9f2ff;
+            color: #333;
+        }
+        .points {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .chart {
+            width: 100%;
+            height: 200px;
+            background-color: #f8f9fa;
+            display: flex;
+            align-items: flex-end;
+            gap: 5px;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+        }
+        .chart-bar {
+            flex-grow: 1;
+            background-color: #0056b3;
+            border-radius: 4px 4px 0 0;
+            position: relative;
+            min-width: 30px;
+        }
+        .chart-label {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+        }
+        .chart-value {
+            position: absolute;
+            top: -20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>BrokerBooster - Exemplos Visuais de Gamificação</h1>
+    
+    <div class="example">
+        <h2>Perfil de Gamificação do Usuário</h2>
+        <div class="mockup profile">
+            <div class="profile-header">
+                <div class="avatar">AR</div>
+                <div class="user-info">
+                    <p class="username">Ana Rodrigues</p>
+                    <p class="level">Nível: <span class="badge badge-silver">Prata</span></p>
+                </div>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <p class="stat-title">Pontos Totais</p>
+                    <p class="stat-value">1,250</p>
+                </div>
+                <div class="stat-card">
+                    <p class="stat-title">Pontos Semanais</p>
+                    <p class="stat-value">320</p>
+                </div>
+                <div class="stat-card">
+                    <p class="stat-title">Conquistas</p>
+                    <p class="stat-value">4/12</p>
+                </div>
+                <div class="stat-card">
+                    <p class="stat-title">Posição no Ranking</p>
+                    <p class="stat-value">#2</p>
+                </div>
+            </div>
+            
+            <div style="width: 100%">
+                <p>Progresso para o próximo nível (Ouro):</p>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: 65%">65%</div>
+                </div>
+                <p class="progress-label">1,250 / 2,000 pontos</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="example">
+        <h2>Conquistas</h2>
+        <div class="mockup">
+            <div class="achievement achievement-completed">
+                <div class="achievement-icon">✓</div>
+                <div class="achievement-info">
+                    <p class="achievement-title">Velocista</p>
+                    <p class="achievement-description">Complete 5 atividades antes do prazo</p>
+                </div>
+                <div class="achievement-progress">
+                    <div class="progress-container" style="margin: 0">
+                        <div class="progress-bar" style="width: 100%">5/5</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="achievement">
+                <div class="achievement-icon">🔄</div>
+                <div class="achievement-info">
+                    <p class="achievement-title">Super Produtivo</p>
+                    <p class="achievement-description">Complete 10 atividades em um único dia</p>
+                </div>
+                <div class="achievement-progress">
+                    <div class="progress-container" style="margin: 0">
+                        <div class="progress-bar" style="width: 70%">7/10</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="achievement achievement-completed">
+                <div class="achievement-icon">✓</div>
+                <div class="achievement-info">
+                    <p class="achievement-title">Negociador Master</p>
+                    <p class="achievement-description">Feche 3 negociações em uma semana</p>
+                </div>
+                <div class="achievement-progress">
+                    <div class="progress-container" style="margin: 0">
+                        <div class="progress-bar" style="width: 100%">3/3</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="achievement">
+                <div class="achievement-icon">🔄</div>
+                <div class="achievement-info">
+                    <p class="achievement-title">Comunicador</p>
+                    <p class="achievement-description">Mantenha comunicação diária por 7 dias</p>
+                </div>
+                <div class="achievement-progress">
+                    <div class="progress-container" style="margin: 0">
+                        <div class="progress-bar" style="width: 57%">4/7</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="example">
+        <h2>Ranking Semanal</h2>
+        <div class="mockup">
+            <table class="leaderboard">
+                <tr>
+                    <th>#</th>
+                    <th>Corretor</th>
+                    <th>Nível</th>
+                    <th>Pontos</th>
+                    <th>Atividades</th>
+                    <th>Negociações</th>
+                </tr>
+                <tr>
+                    <td class="rank first">1</td>
+                    <td>Carlos Mendes</td>
+                    <td><span class="badge badge-gold">Ouro</span></td>
+                    <td class="points">425</td>
+                    <td>14</td>
+                    <td>5</td>
+                </tr>
+                <tr>
+                    <td class="rank second">2</td>
+                    <td>Ana Rodrigues</td>
+                    <td><span class="badge badge-silver">Prata</span></td>
+                    <td class="points">320</td>
+                    <td>11</td>
+                    <td>3</td>
+                </tr>
+                <tr>
+                    <td class="rank third">3</td>
+                    <td>Paulo Silva</td>
+                    <td><span class="badge badge-silver">Prata</span></td>
+                    <td class="points">290</td>
+                    <td>9</td>
+                    <td>4</td>
+                </tr>
+                <tr>
+                    <td class="rank">4</td>
+                    <td>Julia Costa</td>
+                    <td><span class="badge badge-bronze">Bronze</span></td>
+                    <td class="points">210</td>
+                    <td>7</td>
+                    <td>2</td>
+                </tr>
+                <tr>
+                    <td class="rank">5</td>
+                    <td>Marcos Oliveira</td>
+                    <td><span class="badge badge-bronze">Bronze</span></td>
+                    <td class="points">180</td>
+                    <td>6</td>
+                    <td>2</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <div class="example">
+        <h2>Histórico de Pontos</h2>
+        <div class="mockup timeline">
+            <div class="timeline-item">
+                <div class="timeline-icon">+10</div>
+                <div class="timeline-content">
+                    <p><strong>Atividade completada antes do prazo</strong></p>
+                    <p>Visitação ao imóvel na Rua das Flores</p>
+                    <p class="timeline-date">Hoje, 14:35</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-icon">+25</div>
+                <div class="timeline-content">
+                    <p><strong>Negócio fechado</strong></p>
+                    <p>Contrato assinado - Apartamento Centro</p>
+                    <p class="timeline-date">Hoje, 11:20</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-icon">+20</div>
+                <div class="timeline-content">
+                    <p><strong>Conquista desbloqueada</strong></p>
+                    <p>Velocista - 5 atividades antes do prazo</p>
+                    <p class="timeline-date">Ontem, 16:45</p>
+                </div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-icon">+2</div>
+                <div class="timeline-content">
+                    <p><strong>Comunicação ativa</strong></p>
+                    <p>Mensagem enviada para a equipe</p>
+                    <p class="timeline-date">Ontem, 10:15</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="example">
+        <h2>Visão da Diretoria - Resumo de Gamificação</h2>
+        <div class="mockup">
+            <div class="stats">
+                <div class="stat-card">
+                    <p class="stat-title">Usuários Ativos</p>
+                    <p class="stat-value">24</p>
+                </div>
+                <div class="stat-card">
+                    <p class="stat-title">Pontos Totais</p>
+                    <p class="stat-value">18,435</p>
+                </div>
+                <div class="stat-card">
+                    <p class="stat-title">Taxa de Conclusão</p>
+                    <p class="stat-value">68%</p>
+                </div>
+                <div class="stat-card">
+                    <p class="stat-title">Média de Pontos</p>
+                    <p class="stat-value">768</p>
+                </div>
+            </div>
+            
+            <h3>Distribuição por Nível</h3>
+            <div class="chart">
+                <div class="chart-bar" style="height: 120px;">
+                    <div class="chart-value">12</div>
+                    <div class="chart-label">Bronze</div>
+                </div>
+                <div class="chart-bar" style="height: 80px;">
+                    <div class="chart-value">8</div>
+                    <div class="chart-label">Prata</div>
+                </div>
+                <div class="chart-bar" style="height: 40px;">
+                    <div class="chart-value">4</div>
+                    <div class="chart-label">Ouro</div>
+                </div>
+                <div class="chart-bar" style="height: 0px;">
+                    <div class="chart-value">0</div>
+                    <div class="chart-label">Platina</div>
+                </div>
+                <div class="chart-bar" style="height: 0px;">
+                    <div class="chart-value">0</div>
+                    <div class="chart-label">Diamante</div>
+                </div>
+            </div>
+            
+            <h3>Ranking por Tipo de Usuário</h3>
+            <div class="pills">
+                <div class="pill active">Corretores</div>
+                <div class="pill">Gestores</div>
+            </div>
+            
+            <table class="leaderboard">
+                <tr>
+                    <th>#</th>
+                    <th>Nome</th>
+                    <th>Pontos Totais</th>
+                    <th>Nível</th>
+                    <th>Conquistas</th>
+                </tr>
+                <tr>
+                    <td class="rank first">1</td>
+                    <td>Carlos Mendes</td>
+                    <td class="points">3,245</td>
+                    <td><span class="badge badge-gold">Ouro</span></td>
+                    <td>9/12</td>
+                </tr>
+                <tr>
+                    <td class="rank second">2</td>
+                    <td>Ana Rodrigues</td>
+                    <td class="points">1,250</td>
+                    <td><span class="badge badge-silver">Prata</span></td>
+                    <td>4/12</td>
+                </tr>
+                <tr>
+                    <td class="rank third">3</td>
+                    <td>Paulo Silva</td>
+                    <td class="points">1,120</td>
+                    <td><span class="badge badge-silver">Prata</span></td>
+                    <td>3/12</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html> 

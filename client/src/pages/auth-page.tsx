@@ -39,7 +39,13 @@ export default function AuthPage() {
   useEffect(() => {
     if (!isLoading && user) {
       console.log("User already logged in, redirecting to dashboard", user);
-      navigate(user.role === "manager" ? "/manager" : "/broker");
+      if (user.role === "director") {
+        navigate("/director");
+      } else if (user.role === "manager") {
+        navigate("/manager");
+      } else {
+        navigate("/broker");
+      }
     }
   }, [user, isLoading, navigate]);
 
@@ -52,7 +58,9 @@ export default function AuthPage() {
       }, {
         onSuccess: (user) => {
           console.log("Login successful, user:", user);
-          if (user.role === "manager") {
+          if (user.role === "director") {
+            navigate("/director");
+          } else if (user.role === "manager") {
             navigate("/manager");
           } else {
             navigate("/broker");
@@ -74,7 +82,9 @@ export default function AuthPage() {
       avatarInitials: getInitials(values.name)
     }, {
       onSuccess: (user) => {
-        if (user.role === "manager") {
+        if (user.role === "director") {
+          navigate("/director");
+        } else if (user.role === "manager") {
           navigate("/manager");
         } else {
           navigate("/broker");
@@ -140,6 +150,7 @@ export default function AuthPage() {
           
           <div className="text-sm text-center text-neutral-500 mt-6">
             <p>Credenciais de teste:</p>
+            <p>Director: director@example.com / password</p>
             <p>Manager: manager@example.com / password</p>
             <p>Broker: broker@example.com / password</p>
           </div>

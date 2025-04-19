@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>B.Hub - Demonstração de Implementações</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 { color: #3b82f6; margin-bottom: 30px; }
+        h2 { color: #1f2937; border-bottom: 1px solid #e5e7eb; padding-bottom: 10px; }
+        .feature-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .implementation {
+            background-color: #f9fafb;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+        code {
+            background: #f3f4f6;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .code-block {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .mock-image {
+            background: #f3f4f6;
+            border: 1px dashed #d1d5db;
+            padding: 20px;
+            text-align: center;
+            border-radius: 6px;
+            margin: 15px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>B.Hub - Demonstração de Implementações</h1>
+    
+    <div class="feature-card">
+        <h2>1. Chat de Equipe para o Gerente</h2>
+        
+        <p>Implementamos um chat que permite ao gerente se comunicar com toda a equipe simultaneamente. O chat aparece como um componente fixo no canto inferior direito da interface do gerente.</p>
+        
+        <div class="implementation">
+            <h3>Implementação</h3>
+            <p>Criamos um novo componente <code>TeamChat</code> que:</p>
+            <ul>
+                <li>Mantém um estado para as mensagens</li>
+                <li>Usa <code>receiverId=0</code> para identificar mensagens de equipe</li>
+                <li>Envia notificações para todos os membros da equipe</li>
+            </ul>
+            
+            <div class="code-block">// Implementação do chat de equipe
+import { useEffect, useRef, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Message, User } from "@shared/schema";
+
+// Buscar mensagens da equipe
+const { data: messages } = useQuery<Message[]>({
+  queryKey: ["/api/messages/team"],
+  queryFn: async () => {
+    const res = await fetch("/api/messages/team");
+    if (!res.ok) throw new Error("Falha ao buscar mensagens da equipe");
+    return res.json();
+  }
+});</div>
+            
+            <div class="mock-image">
+                <p>[Interface do Chat de Equipe]</p>
+                <p>Um componente de chat com lista de mensagens e campo de entrada no canto inferior direito da tela</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="feature-card">
+        <h2>2. Atividades sem Clientes</h2>
+        
+        <p>Simplificamos o formulário de atividades removendo os campos de cliente e imóvel, fazendo com que o sistema foque apenas na tarefa em si.</p>
+        
+        <div class="implementation">
+            <h3>Implementação</h3>
+            <p>Modificamos o <code>activities-card.tsx</code> para remover os campos desnecessários:</p>
+            
+            <div class="code-block">// Schema simplificado
+const createActivitySchema = z.object({
+  title: z.string().min(3, { message: "Título deve ter pelo menos 3 caracteres" }),
+  description: z.string().optional(),
+  assignedTo: z.number({ message: "Selecione um corretor" }),
+  dueDate: z.string().min(1, { message: "Selecione uma data de vencimento" }),
+});</div>
+            
+            <div class="mock-image">
+                <p>[Formulário de Atividades Simplificado]</p>
+                <p>Formulário apenas com campos para título, descrição, corretor responsável e data de vencimento</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="feature-card">
+        <h2>3. Gráficos Avançados</h2>
+        
+        <p>Criamos um componente de visualização de dados com gráficos avançados para análise de desempenho, oferecendo múltiplas perspectivas dos dados.</p>
+        
+        <div class="implementation">
+            <h3>Implementação</h3>
+            <p>Desenvolvemos o <code>EnhancedPerformanceChart</code> com:</p>
+            <ul>
+                <li>Gráficos de área para tendências temporais</li>
+                <li>Gráficos de pizza para distribuição</li>
+                <li>Gráficos de barras para comparação</li>
+                <li>Gráficos de radar para análise multidimensional</li>
+            </ul>
+            
+            <div class="code-block">// Componente de gráficos avançados
+<Tabs defaultValue="trend">
+  <TabsList className="grid w-full grid-cols-4">
+    <TabsTrigger value="trend">Tendências</TabsTrigger>
+    <TabsTrigger value="activities">Atividades</TabsTrigger>
+    <TabsTrigger value="deals">Negociações</TabsTrigger>
+    <TabsTrigger value="team">Equipe</TabsTrigger>
+  </TabsList>
+  
+  <TabsContent value="trend" className="mt-4">
+    <div className="h-[300px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <AreaChart data={performanceTrendData}>
+          {/* ... configurações do gráfico ... */}
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  </TabsContent>
+  
+  {/* ... outros tabs com diferentes tipos de gráfico ... */}
+</Tabs></div>
+            
+            <div class="mock-image">
+                <p>[Gráficos Avançados]</p>
+                <p>Painel com quatro abas: Tendências (gráfico de área), Atividades (gráfico de pizza), Negociações (gráfico de barras) e Equipe (gráfico de radar)</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="feature-card">
+        <h2>Conclusão e Próximos Passos</h2>
+        <p>As implementações foram concluídas com sucesso, melhorando significativamente a usabilidade do B.Hub.</p>
+        <p>Principais benefícios:</p>
+        <ul>
+            <li>Comunicação mais eficiente entre gerente e equipe</li>
+            <li>Formulários simplificados para maior produtividade</li>
+            <li>Visualizações de dados mais completas para melhores decisões</li>
+        </ul>
+    </div>
+</body>
+</html> 
