@@ -22,7 +22,7 @@ export default function ManagerDashboard() {
   const [, navigate] = useLocation();
   const [chatOpen, setChatOpen] = useState(false);
   
-  // Redirect if not authenticated or not a manager
+  // Redirecionar se não estiver autenticado ou não for gerente
   useEffect(() => {
     if (!isLoading) {
       if (!user) {
@@ -33,7 +33,7 @@ export default function ManagerDashboard() {
     }
   }, [user, isLoading, navigate]);
 
-  // Show loading state while checking authentication
+  // Mostrar estado de carregamento enquanto verifica autenticação
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -42,7 +42,7 @@ export default function ManagerDashboard() {
     );
   }
 
-  // If still loading or no user, don't render dashboard yet
+  // Se ainda estiver carregando ou sem usuário, não renderizar o dashboard ainda
   if (!user || user.role !== "manager") {
     return null;
   }
@@ -63,7 +63,7 @@ export default function ManagerDashboard() {
     queryKey: ["/api/performance"],
   });
 
-  // Calculate stats
+  // Calcular estatísticas
   const pendingActivities = activities?.filter(a => a.status !== "completed").length || 0;
   const totalActivities = activities?.length || 0;
   const activeDeals = deals?.length || 0;
@@ -71,7 +71,7 @@ export default function ManagerDashboard() {
   const averagePerformance = performances && performances.length > 0
     ? Math.floor(performances.reduce((sum, p) => sum + p.score, 0) / performances.length)
     : 0;
-  const weeklyGrowth = "+3.2%"; // In a real app, this would be calculated based on historical data
+  const weeklyGrowth = "+3.2%"; // Em um app real, isso seria calculado com base em dados históricos
 
   // Converter as performances para o formato esperado pelo PerformanceCard
   const performersProps = performances ? convertPerformancesToPerformerProps(performances) : [];
@@ -80,7 +80,7 @@ export default function ManagerDashboard() {
     <WebSocketProvider userId={user.id}>
       <div className="min-h-screen bg-neutral-50 pb-16 md:pb-0 relative">
         <DashboardHeader 
-          title="Dashboard do Gestor" 
+          title="Painel do Gerente" 
           user={{
             name: user.name,
             initials: user.avatarInitials || "MG",
@@ -90,7 +90,7 @@ export default function ManagerDashboard() {
         />
         
         <main className="container mx-auto px-4 py-6">
-          {/* Stats Cards */}
+          {/* Cards de Estatísticas */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <StatCard 
               title="Atividades Pendentes"
@@ -120,7 +120,7 @@ export default function ManagerDashboard() {
             />
             
             <StatCard 
-              title="Performance Média"
+              title="Desempenho Médio"
               value={averagePerformance}
               suffix="/100"
               icon="leaderboard"
@@ -137,7 +137,7 @@ export default function ManagerDashboard() {
             />
           </div>
           
-          {/* Enhanced Performance Chart */}
+          {/* Gráfico de Desempenho Avançado */}
           <div className="mb-6">
             <EnhancedPerformanceChart 
               activities={activities || []}
@@ -149,14 +149,14 @@ export default function ManagerDashboard() {
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              {/* Performance Card */}
+              {/* Card de Desempenho */}
               <PerformanceCard 
                 performances={performersProps}
                 isLoading={isPerformancesLoading} 
                 className="mb-6"
               />
               
-              {/* Negotiations Card */}
+              {/* Card de Negociações */}
               <NegotiationsCard 
                 deals={deals || []}
                 isLoading={isDealsLoading}
@@ -165,7 +165,7 @@ export default function ManagerDashboard() {
             </div>
             
             <div>
-              {/* Activities Card */}
+              {/* Card de Atividades */}
               <ActivitiesCard 
                 activities={activities || []}
                 isLoading={isActivitiesLoading}
@@ -173,7 +173,7 @@ export default function ManagerDashboard() {
                 className="mb-6"
               />
               
-              {/* Notifications Card */}
+              {/* Card de Notificações */}
               <NotificationsCard 
                 notifications={notifications || []}
                 isLoading={isNotificationsLoading}
@@ -182,7 +182,7 @@ export default function ManagerDashboard() {
           </div>
         </main>
         
-        {/* Mobile Chat Button */}
+        {/* Botão de Chat Mobile */}
         <div className="md:hidden fixed bottom-4 right-4 z-10">
           <Button 
             onClick={() => setChatOpen(true)}
@@ -192,7 +192,7 @@ export default function ManagerDashboard() {
           </Button>
         </div>
         
-        {/* Mobile Chat Drawer */}
+        {/* Drawer de Chat Mobile */}
         <Drawer open={chatOpen} onOpenChange={setChatOpen}>
           <DrawerContent className="h-[90vh]">
             <div className="h-full p-4">
@@ -207,7 +207,7 @@ export default function ManagerDashboard() {
           </DrawerContent>
         </Drawer>
         
-        {/* Desktop Chat */}
+        {/* Chat para Desktop */}
         <div className="hidden md:block fixed right-4 bottom-4 w-[350px] h-[500px] shadow-xl rounded-lg overflow-hidden border border-neutral-200 z-10">
           <TeamChat currentUser={user} />
         </div>

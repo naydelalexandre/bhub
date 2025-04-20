@@ -19,7 +19,7 @@ export default function BrokerDashboard() {
   const { user, isLoading } = useAuth();
   const [, navigate] = useLocation();
   
-  // Redirect if not authenticated or not a broker
+  // Redirecionar se não estiver autenticado ou não for corretor
   useEffect(() => {
     if (!isLoading) {
       if (!user) {
@@ -30,7 +30,7 @@ export default function BrokerDashboard() {
     }
   }, [user, isLoading, navigate]);
 
-  // Show loading state while checking authentication
+  // Mostrar estado de carregamento enquanto verifica autenticação
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -39,7 +39,7 @@ export default function BrokerDashboard() {
     );
   }
 
-  // If still loading or no user, don't render dashboard yet
+  // Se ainda estiver carregando ou sem usuário, não renderizar o dashboard ainda
   if (!user || user.role !== "broker") {
     return null;
   }
@@ -60,18 +60,18 @@ export default function BrokerDashboard() {
     queryKey: ["/api/performance"],
   });
 
-  // Find a manager to chat with (in a real app, would be based on activities or deals)
+  // Encontrar um gerente para chat (em um app real, seria baseado em atividades ou negociações)
   const { data: users } = useQuery({
     queryKey: ["/api/users"],
     queryFn: async () => {
-      // Mock data for users since we don't have an API endpoint for this
+      // Dados fictícios para usuários já que não temos um endpoint de API para isso
       return [{ id: 1, name: "Gestor Márcio", role: "manager" }];
     }
   });
 
   const manager = users?.find(u => u.role === "manager");
 
-  // Calculate stats
+  // Calcular estatísticas
   const pendingActivities = activities?.filter(a => a.status !== "completed").length || 0;
   const totalActivities = activities?.length || 0;
   const activeDeals = deals?.length || 0;
@@ -82,7 +82,7 @@ export default function BrokerDashboard() {
     <WebSocketProvider userId={user.id}>
       <div className="min-h-screen bg-neutral-50">
         <DashboardHeader 
-          title="Dashboard do Corretor" 
+          title="Painel do Corretor" 
           user={{
             name: user.name,
             initials: user.avatarInitials || "BC",
@@ -92,7 +92,7 @@ export default function BrokerDashboard() {
         />
         
         <main className="container mx-auto px-4 py-6 pb-16 md:pb-6">
-          {/* Stats Cards */}
+          {/* Cards de Estatísticas */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <StatCard 
               title="Atividades Pendentes"
@@ -122,7 +122,7 @@ export default function BrokerDashboard() {
             />
             
             <StatCard 
-              title="Performance Score"
+              title="Pontuação de Desempenho"
               value={performance?.score || 0}
               suffix="/100"
               icon="leaderboard"
@@ -136,7 +136,7 @@ export default function BrokerDashboard() {
             />
           </div>
           
-          {/* Performance Chart */}
+          {/* Gráfico de Desempenho */}
           <div className="mb-6">
             <PerformanceChart 
               activities={activities || []}
@@ -145,14 +145,14 @@ export default function BrokerDashboard() {
             />
           </div>
           
-          {/* Performance Metrics */}
+          {/* Métricas de Desempenho */}
           <Card className="mb-6">
             <CardHeader>
               <CardTitle>Metas e Objetivos</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Activity Completion Card */}
+                {/* Card de Conclusão de Atividades */}
                 <div className="bg-primary/5 p-4 rounded-lg">
                   <div className="flex justify-between items-center mb-2">
                     <p className="text-sm text-neutral-400">Atividades Concluídas</p>
@@ -169,7 +169,7 @@ export default function BrokerDashboard() {
                   <p className="text-xs text-neutral-300">Meta semanal: 10 atividades</p>
                 </div>
                 
-                {/* Deal Progression Card */}
+                {/* Card de Negociações */}
                 <div className="bg-secondary/5 p-4 rounded-lg">
                   <div className="flex justify-between items-center mb-2">
                     <p className="text-sm text-neutral-400">Negociações Ativas</p>
@@ -191,7 +191,7 @@ export default function BrokerDashboard() {
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              {/* Activities Card */}
+              {/* Card de Atividades */}
               <ActivitiesCard 
                 activities={activities || []}
                 isLoading={isActivitiesLoading}
@@ -199,7 +199,7 @@ export default function BrokerDashboard() {
                 className="mb-6"
               />
               
-              {/* Negotiations Card */}
+              {/* Card de Negociações */}
               <NegotiationsCard 
                 deals={deals || []}
                 isLoading={isDealsLoading}
@@ -208,14 +208,14 @@ export default function BrokerDashboard() {
             </div>
             
             <div>
-              {/* Notifications Card */}
+              {/* Card de Notificações */}
               <NotificationsCard 
                 notifications={notifications || []}
                 isLoading={isNotificationsLoading}
                 className="mb-6"
               />
               
-              {/* Chat Card */}
+              {/* Card de Chat */}
               {manager && (
                 <ChatContainer 
                   otherUser={{

@@ -87,7 +87,7 @@ export default function GamificationPage() {
     );
   }
   
-  // Se não há perfil, mostrar uma mensagem
+  // Se não há perfil, mostrar uma mensagem amigável
   if (!profile) {
     return (
       <div className="container mx-auto py-8">
@@ -95,7 +95,7 @@ export default function GamificationPage() {
           <CardContent className="p-8 text-center">
             <h2 className="text-2xl font-bold mb-2">Perfil não encontrado</h2>
             <p className="text-muted-foreground">
-              Não foi possível carregar o perfil de gamificação. Por favor, tente novamente mais tarde.
+              Não foi possível carregar seu perfil de gamificação. Por favor, tente novamente em alguns instantes.
             </p>
           </CardContent>
         </Card>
@@ -134,7 +134,7 @@ export default function GamificationPage() {
             <div className="flex flex-col justify-center w-full md:w-1/2">
               <div className="flex justify-between mb-2">
                 <span className="text-sm text-muted-foreground">
-                  Progresso para {profile.levelProgress.nextLevel || 'Nível Máximo'}
+                  Progresso para o {profile.levelProgress.nextLevel || 'Nível Máximo'}
                 </span>
                 <span className="text-sm font-medium">
                   {profile.levelProgress.currentPoints} / {profile.levelProgress.pointsForNextLevel} pontos
@@ -142,7 +142,7 @@ export default function GamificationPage() {
               </div>
               <Progress value={profile.levelProgress.progress} className="h-2.5" />
               <span className="text-xs text-muted-foreground mt-2">
-                {profile.levelProgress.progress}% completo
+                {profile.levelProgress.progress}% do caminho concluído
               </span>
             </div>
           </div>
@@ -202,7 +202,7 @@ export default function GamificationPage() {
                 <Clock className="h-6 w-6 text-orange-700" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Sequência</p>
+                <p className="text-sm text-muted-foreground">Sequência de Atividade</p>
                 <h3 className="text-2xl font-bold">{profile.profile.streak} dias</h3>
               </div>
             </div>
@@ -214,13 +214,13 @@ export default function GamificationPage() {
       <Tabs defaultValue="achievements" className="w-full">
         <TabsList className="mb-6">
           <TabsTrigger value="achievements" className="gap-2">
-            <Award className="h-4 w-4" /> Conquistas
+            <Award className="h-4 w-4" /> Minhas Conquistas
           </TabsTrigger>
           <TabsTrigger value="ranking" className="gap-2">
-            <Users className="h-4 w-4" /> Ranking
+            <Users className="h-4 w-4" /> Ranking da Equipe
           </TabsTrigger>
           <TabsTrigger value="history" className="gap-2">
-            <Clock className="h-4 w-4" /> Histórico
+            <Clock className="h-4 w-4" /> Histórico de Pontos
           </TabsTrigger>
         </TabsList>
         
@@ -267,7 +267,7 @@ export default function GamificationPage() {
               {completedAchievements.length > 0 && (
                 <>
                   <h3 className="text-lg font-medium mt-6 mb-4">
-                    Conquistas completas ({completedAchievements.length})
+                    Conquistas obtidas ({completedAchievements.length})
                   </h3>
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {completedAchievements.map((achievement) => (
@@ -280,7 +280,7 @@ export default function GamificationPage() {
               {inProgressAchievements.length > 0 && (
                 <>
                   <h3 className="text-lg font-medium mt-8 mb-4">
-                    Em progresso ({inProgressAchievements.length})
+                    Conquistas em andamento ({inProgressAchievements.length})
                   </h3>
                   <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {inProgressAchievements.map((achievement) => (
@@ -297,14 +297,14 @@ export default function GamificationPage() {
         <TabsContent value="ranking">
           <Card>
             <CardHeader>
-              <CardTitle>Ranking Semanal</CardTitle>
+              <CardTitle>Ranking Semanal da Equipe</CardTitle>
             </CardHeader>
             <CardContent>
               {weeklyRanking.length === 0 ? (
                 <div className="text-center py-8">
                   <Users className="h-12 w-12 mx-auto text-muted-foreground opacity-20" />
                   <p className="mt-4 text-muted-foreground">
-                    Nenhum dado de ranking disponível no momento.
+                    Sem dados de ranking disponíveis no momento.
                   </p>
                 </div>
               ) : (
@@ -353,7 +353,7 @@ export default function GamificationPage() {
                 <div className="text-center py-8">
                   <Clock className="h-12 w-12 mx-auto text-muted-foreground opacity-20" />
                   <p className="mt-4 text-muted-foreground">
-                    Nenhum histórico de pontos disponível no momento.
+                    Seu histórico de pontos estará disponível quando você começar a acumular pontos.
                   </p>
                 </div>
               ) : (

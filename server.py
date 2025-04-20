@@ -10,13 +10,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def end_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Content-Type', 'text/html; charset=utf-8')
         super().end_headers()
 
 handler = Handler
 
 with socketserver.TCPServer(("", PORT), handler) as httpd:
     print("\n=================================================")
-    print("     B.Hub - Servidor de Demonstração     ")
+    print("     BrokerBooster - Servidor de Demonstração     ")
     print("=================================================\n")
     print(f"Servidor iniciado com sucesso na porta {PORT}")
     print(f"Para visualizar, acesse: http://localhost:{PORT}/demo.html")

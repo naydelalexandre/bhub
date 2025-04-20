@@ -1,71 +1,92 @@
 @echo off
-REM Script de inicialização unificado para BrokerBooster
-REM Criado para facilitar o processo de inicialização e configuração
-
-echo ===================================================
-echo             INICIANDO BROKERBOOSTER
-echo ===================================================
+echo ======================================================
+echo    INICIALIZAÇÃO DO SISTEMA BROKERBOOSTER
+echo ======================================================
 echo.
+echo Verificando por processos anteriores...
 
-REM Verifica e mata processos existentes
-echo Encerrando processos anteriores...
-taskkill /F /IM node.exe /FI "WINDOWTITLE eq BrokerBooster*" 2>nul
-taskkill /F /IM python.exe /FI "WINDOWTITLE eq BrokerBooster*" 2>nul
-echo.
+REM Verifica se há processos rodando e os termina
+taskkill /f /im python.exe /fi "WINDOWTITLE eq Demonstration Python Server" 2>NUL
+taskkill /f /im node.exe /fi "WINDOWTITLE eq Visual Examples Server" 2>NUL
+taskkill /f /im node.exe /fi "WINDOWTITLE eq B.Hub Demonstration Server" 2>NUL
+taskkill /f /im node.exe /fi "WINDOWTITLE eq B.Hub Visual Examples Server" 2>NUL
+taskkill /f /im node.exe /fi "WINDOWTITLE eq Gamification Server" 2>NUL
+taskkill /f /im node.exe /fi "WINDOWTITLE eq BrokerBooster Server" 2>NUL
+taskkill /f /im node.exe /fi "WINDOWTITLE eq BrokerBooster Client" 2>NUL
 
-REM Verifica portas em uso
-echo Verificando portas em uso...
-set PORTS_TO_CHECK=3000 3001 3003 3004 3005 3007 5173 8080
-for %%p in (%PORTS_TO_CHECK%) do (
-    netstat -ano | findstr :%%p > nul
-    if not errorlevel 1 (
-        echo Porta %%p em uso. Liberando...
-        for /f "tokens=5" %%a in ('netstat -ano ^| findstr :%%p ^| findstr LISTENING') do (
-            echo Encerrando processo: %%a
-            taskkill /F /PID %%a 2>nul
-        )
-    )
+echo Verificando se portas estão disponíveis...
+
+REM Verifica se portas estão sendo usadas
+netstat -ano | findstr :3001 >NUL
+if not %ERRORLEVEL% == 0 (
+    echo Porta 3001 está livre.
+) else (
+    echo ATENÇÃO: Porta 3001 está em uso. Tentando liberar...
+    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3001') do taskkill /f /pid %%a 2>NUL
 )
-echo.
 
-REM Iniciar servidores em janelas separadas
+netstat -ano | findstr :3003 >NUL
+if not %ERRORLEVEL% == 0 (
+    echo Porta 3003 está livre.
+) else (
+    echo ATENÇÃO: Porta 3003 está em uso. Tentando liberar...
+    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3003') do taskkill /f /pid %%a 2>NUL
+)
+
+netstat -ano | findstr :3004 >NUL
+if not %ERRORLEVEL% == 0 (
+    echo Porta 3004 está livre.
+) else (
+    echo ATENÇÃO: Porta 3004 está em uso. Tentando liberar...
+    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3004') do taskkill /f /pid %%a 2>NUL
+)
+
+netstat -ano | findstr :3007 >NUL
+if not %ERRORLEVEL% == 0 (
+    echo Porta 3007 está livre.
+) else (
+    echo ATENÇÃO: Porta 3007 está em uso. Tentando liberar...
+    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3007') do taskkill /f /pid %%a 2>NUL
+)
+
+echo.
 echo Iniciando servidores de demonstração...
+echo.
 
-start "BrokerBooster - Python Server" cmd /c "cd %~dp0 && python server.py"
-timeout /t 2 > nul
-
-start "BrokerBooster - Exemplos Visuais" cmd /c "cd %~dp0 && node serve-examples.mjs"
-timeout /t 2 > nul
-
-start "BrokerBooster - B.Hub" cmd /c "cd %~dp0 && node serve-bhub.mjs"
-timeout /t 2 > nul
-
-start "BrokerBooster - Gamificação" cmd /c "cd %~dp0 && node serve-gamification.mjs"
-timeout /t 2 > nul
-
-REM Iniciar servidor e cliente (descomentado, se executar com npm)
-REM echo Iniciando aplicação principal...
-REM start "BrokerBooster - Server" cmd /c "cd %~dp0\server && npm run dev"
-REM timeout /t 5 > nul
-REM start "BrokerBooster - Client" cmd /c "cd %~dp0\client && npm run dev"
+REM Inicia servidores de demostração em novas janelas
+start "Servidor Python - Demonstração" cmd /k "cd /d %~dp0 && python server.py"
+start "Exemplos Visuais" cmd /k "cd /d %~dp0 && node server-examples.js 3003"
+start "Demonstração B.Hub" cmd /k "cd /d %~dp0 && node server-bhub.js 3004"
+start "Exemplos Visuais B.Hub" cmd /k "cd /d %~dp0 && node server-bhub-examples.js 3005"
+start "Sistema de Gamificação" cmd /k "cd /d %~dp0 && node server-gamification.js 3007"
 
 echo.
-echo ===================================================
-echo             BROKERBOOSTER INICIADO!
-echo ===================================================
+echo ======================================================
+echo  LINKS DE ACESSO ÀS DEMONSTRAÇÕES:
+echo ======================================================
 echo.
-echo Acesse as demonstrações nos seguintes endereços:
-echo - Demonstração Python: http://localhost:3001/demo.html
-echo - Exemplos Visuais: http://localhost:3003
-echo - B.Hub Demonstração: http://localhost:3004
-echo - B.Hub Exemplos Visuais: http://localhost:3005
-echo - Gamificação: http://localhost:3007
+echo  1. Demonstração Python: http://localhost:3001/demo.html
+echo  2. Exemplos Visuais: http://localhost:3003
+echo  3. Demonstração B.Hub: http://localhost:3004
+echo  4. Exemplos Visuais B.Hub: http://localhost:3005
+echo  5. Sistema de Gamificação: http://localhost:3007
 echo.
-echo Para iniciar o servidor principal: 
-echo   cd server && npm run dev
+echo ======================================================
 echo.
-echo Para iniciar o cliente: 
-echo   cd client && npm run dev
+
+REM O servidor principal e o cliente devem ser iniciados separadamente
+echo Para iniciar o servidor e cliente principal da aplicação,
+echo abra duas janelas de Prompt de Comando (cmd) e execute:
 echo.
-echo Pressione qualquer tecla para fechar esta janela...
-pause > nul 
+echo SERVIDOR (primeira janela CMD):
+echo   cd %~dp0\server
+echo   npm run dev
+echo.
+echo CLIENTE (segunda janela CMD):
+echo   cd %~dp0\client
+echo   npm run dev
+echo.
+echo ======================================================
+echo.
+
+pause 

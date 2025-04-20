@@ -14,18 +14,18 @@ import { Loader2 } from "lucide-react";
 import { getInitials } from "@/lib/utils";
 import { useAuth } from "@/hooks/use-auth";
 
-// Login schema
+// Esquema de validação para login
 const loginSchema = z.object({
-  username: z.string().email("Por favor insira um email válido"),
-  password: z.string().min(1, "Por favor insira uma senha"),
+  username: z.string().email("Por favor, insira um email válido"),
+  password: z.string().min(1, "Por favor, insira sua senha"),
   remember: z.boolean().optional().default(false),
 });
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-// Register schema
+// Esquema de validação para cadastro
 const registerSchema = z.object({
   name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
-  username: z.string().email("Por favor insira um email válido"),
+  username: z.string().email("Por favor, insira um email válido"),
   password: z.string().min(6, "Senha deve ter pelo menos 6 caracteres"),
   role: z.enum(["manager", "broker"]),
 });
@@ -35,10 +35,10 @@ export default function AuthPage() {
   const { user, isLoading, loginMutation, registerMutation } = useAuth();
   const [, navigate] = useLocation();
   
-  // Redirect if already logged in
+  // Redirecionar se já estiver logado
   useEffect(() => {
     if (!isLoading && user) {
-      console.log("User already logged in, redirecting to dashboard", user);
+      console.log("Usuário já está logado, redirecionando para o dashboard", user);
       if (user.role === "director") {
         navigate("/director");
       } else if (user.role === "manager") {
@@ -49,7 +49,7 @@ export default function AuthPage() {
     }
   }, [user, isLoading, navigate]);
 
-  // Handle login submission
+  // Processar o envio do login
   const handleLogin = async (values: LoginFormValues) => {
     try {
       loginMutation.mutate({
@@ -57,7 +57,7 @@ export default function AuthPage() {
         password: values.password
       }, {
         onSuccess: (user) => {
-          console.log("Login successful, user:", user);
+          console.log("Login realizado com sucesso, usuário:", user);
           if (user.role === "director") {
             navigate("/director");
           } else if (user.role === "manager") {
@@ -67,15 +67,15 @@ export default function AuthPage() {
           }
         },
         onError: (error) => {
-          console.error("Login error:", error);
+          console.error("Erro no login:", error);
         }
       });
     } catch (error) {
-      console.error("Login exception:", error);
+      console.error("Exceção no login:", error);
     }
   };
 
-  // Handle registration submission
+  // Processar o envio do cadastro
   const handleRegister = async (values: RegisterFormValues) => {
     registerMutation.mutate({
       ...values,
@@ -95,22 +95,22 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Form Section */}
+      {/* Seção do Formulário */}
       <div className="w-full md:w-1/2 flex items-center justify-center p-8">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-primary mb-2">
-              Plataforma de Performance
+              BrokerBooster
             </h1>
             <p className="text-muted-foreground">
-              Gestão de atividades e negociações imobiliárias
+              Plataforma de gestão e gamificação para equipes imobiliárias
             </p>
           </div>
 
           <Tabs defaultValue="login" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="register">Cadastro</TabsTrigger>
+              <TabsTrigger value="login">Entrar</TabsTrigger>
+              <TabsTrigger value="register">Cadastrar</TabsTrigger>
             </TabsList>
             
             <TabsContent value="login">
@@ -118,7 +118,7 @@ export default function AuthPage() {
                 <CardHeader className="space-y-1">
                   <CardTitle className="text-2xl">Bem-vindo de volta</CardTitle>
                   <CardDescription>
-                    Entre com suas credenciais para acessar a plataforma
+                    Entre com suas credenciais para acessar o sistema
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -135,7 +135,7 @@ export default function AuthPage() {
                 <CardHeader className="space-y-1">
                   <CardTitle className="text-2xl">Criar uma conta</CardTitle>
                   <CardDescription>
-                    Preencha os dados abaixo para se cadastrar
+                    Preencha seus dados para começar a usar a plataforma
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -149,40 +149,40 @@ export default function AuthPage() {
           </Tabs>
           
           <div className="text-sm text-center text-neutral-500 mt-6">
-            <p>Credenciais de teste:</p>
-            <p>Director: director@example.com / password</p>
-            <p>Manager: manager@example.com / password</p>
-            <p>Broker: broker@example.com / password</p>
+            <p>Acessos para demonstração:</p>
+            <p>Diretor: director@example.com / password</p>
+            <p>Gerente: manager@example.com / password</p>
+            <p>Corretor: broker@example.com / password</p>
           </div>
         </div>
       </div>
 
-      {/* Hero Section */}
+      {/* Seção de Apresentação */}
       <div className="w-full md:w-1/2 bg-primary p-8 flex items-center justify-center">
         <div className="text-white max-w-md text-center md:text-left">
           <h2 className="text-3xl font-bold mb-4">
-            Aumente a performance da sua equipe
+            Potencialize o desempenho da sua equipe
           </h2>
           <p className="text-lg mb-6">
-            Uma plataforma completa para gestão de atividades, negociações e performance
-            de corretores imobiliários.
+            Uma plataforma completa para gestão de atividades, negociações e desempenho
+            de profissionais do mercado imobiliário.
           </p>
           <ul className="space-y-3 mb-8">
             <li className="flex items-center">
               <span className="mr-2">✓</span>
-              <span>Monitore o desempenho da sua equipe</span>
+              <span>Acompanhe o desempenho da sua equipe em tempo real</span>
             </li>
             <li className="flex items-center">
               <span className="mr-2">✓</span>
-              <span>Acompanhe negociações em tempo real</span>
+              <span>Gerencie negociações de forma eficiente</span>
             </li>
             <li className="flex items-center">
               <span className="mr-2">✓</span>
-              <span>Gerencie atividades e prazos</span>
+              <span>Organize atividades e acompanhe prazos</span>
             </li>
             <li className="flex items-center">
               <span className="mr-2">✓</span>
-              <span>Comunicação instantânea entre equipes</span>
+              <span>Motive sua equipe com gamificação inteligente</span>
             </li>
           </ul>
         </div>
@@ -327,15 +327,15 @@ function RegisterForm({ onSubmit, isLoading }: { onSubmit: (values: RegisterForm
           name="role"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Tipo de Usuário</FormLabel>
+              <FormLabel>Perfil</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Selecione o tipo de usuário" />
+                    <SelectValue placeholder="Selecione seu perfil" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="manager">Gestor</SelectItem>
+                  <SelectItem value="manager">Gerente</SelectItem>
                   <SelectItem value="broker">Corretor</SelectItem>
                 </SelectContent>
               </Select>
@@ -346,7 +346,7 @@ function RegisterForm({ onSubmit, isLoading }: { onSubmit: (values: RegisterForm
 
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-          Cadastrar
+          Criar Conta
         </Button>
       </form>
     </Form>

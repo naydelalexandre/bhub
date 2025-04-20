@@ -23,19 +23,19 @@ interface AchievementCardProps {
   className?: string;
 }
 
-// Mapa de cores para diferentes dificuldades
+// Mapa de cores para diferentes níveis de dificuldade
 const difficultyColors = {
   easy: 'bg-green-100 text-green-800 hover:bg-green-200',
   medium: 'bg-orange-100 text-orange-800 hover:bg-orange-200',
   hard: 'bg-red-100 text-red-800 hover:bg-red-200',
 };
 
-// Componente AchievementCard
+// Componente de Conquista
 export function AchievementCard({ achievement, className }: AchievementCardProps) {
   // Calcula o progresso em percentual
   const progressPercentage = achievement.progress ? Math.min(100, achievement.progress) : 0;
   
-  // Formata a data
+  // Formata a data de conclusão
   const formattedDate = achievement.completedAt 
     ? new Date(achievement.completedAt).toLocaleDateString('pt-BR') 
     : '';
@@ -73,7 +73,7 @@ export function AchievementCard({ achievement, className }: AchievementCardProps
         {!achievement.completed && (
           <div className="space-y-2">
             <div className="flex justify-between items-center text-xs">
-              <span>Progresso</span>
+              <span>Seu progresso</span>
               <span className="font-medium">{progressPercentage}%</span>
             </div>
             <Progress value={progressPercentage} className="h-2" />
@@ -90,7 +90,7 @@ export function AchievementCard({ achievement, className }: AchievementCardProps
         {achievement.completed ? (
           <div className="flex items-center gap-1 text-green-600">
             <CheckCircle2 className="h-4 w-4" />
-            <span>Concluído {formattedDate && `em ${formattedDate}`}</span>
+            <span>Conquistado {formattedDate && `em ${formattedDate}`}</span>
           </div>
         ) : (
           <div className="flex items-center gap-1">

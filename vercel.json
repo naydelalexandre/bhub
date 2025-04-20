@@ -1,46 +1,6 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "server/server.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "client/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "server/server.js"
-    },
-    {
-      "src": "/",
-      "dest": "server.py"
-    },
-    {
-      "src": "/demo.html",
-      "dest": "demo.html"
-    },
-    {
-      "src": "/bhub-demo.html",
-      "dest": "bhub-demo.html"
-    },
-    {
-      "src": "/bhub-examples.html",
-      "dest": "bhub-examples.html"
-    },
-    {
-      "src": "/bhub-gamification.html",
-      "dest": "bhub-gamification.html"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/$1"
-    }
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 } 
