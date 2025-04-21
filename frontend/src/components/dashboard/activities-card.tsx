@@ -13,8 +13,10 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { apiRequest } from "@/lib/queryClient";
-import { Loader2 } from "lucide-react";
+import { Loader2, Star } from "lucide-react";
 import TaskItem from "@/components/task-item";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
 
 interface ActivitiesCardProps {
   activities: Activity[];
@@ -28,6 +30,8 @@ const createActivitySchema = z.object({
   description: z.string().optional(),
   assignedTo: z.number({ message: "Selecione um corretor" }),
   dueDate: z.string().min(1, { message: "Selecione uma data de vencimento" }),
+  points: z.number().min(1, { message: "Defina a pontuação da atividade" }).max(100),
+  category: z.string().min(1, { message: "Selecione uma categoria" }),
 });
 
 type CreateActivityFormValues = z.infer<typeof createActivitySchema>;
@@ -58,6 +62,8 @@ export default function ActivitiesCard({ activities, isLoading, userRole, classN
       description: "",
       assignedTo: 0,
       dueDate: "",
+      points: 10,
+      category: "tarefa",
     }
   });
 
@@ -74,6 +80,16 @@ export default function ActivitiesCard({ activities, isLoading, userRole, classN
     { id: 4, name: "Márcia Gomes" },
     { id: 5, name: "Roberto Costa" },
     { id: 6, name: "Lucia Pereira" }
+  ];
+
+  // Categorias de atividades
+  const activityCategories = [
+    { id: "tarefa", name: "Tarefa Padrão" },
+    { id: "captacao", name: "Captação" },
+    { id: "visita", name: "Visita" },
+    { id: "negociacao", name: "Negociação" },
+    { id: "fechamento", name: "Fechamento" },
+    { id: "pos_venda", name: "Pós-Venda" }
   ];
 
   return (
@@ -165,6 +181,59 @@ export default function ActivitiesCard({ activities, isLoading, userRole, classN
                       )}
                     />
                   </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Categoria</FormLabel>
+                          <Select
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Selecione uma categoria" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {activityCategories.map(category => (
+                                <SelectItem key={category.id} value={category.id}>
+                                  {category.name}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="points"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Pontos de Gamificação</FormLabel>
+                          <FormControl>
+                            <div className="flex items-center">
+                              <Input 
+                                type="number" 
+                                min="1" 
+                                max="100" 
+                                {...field} 
+                                onChange={e => field.onChange(parseInt(e.target.value) || 0)}
+                              />
+                              <Star className="h-4 w-4 text-yellow-500 ml-2" />
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
                   
                   <Button type="submit" disabled={createActivityMutation.isPending} className="w-full">
                     {createActivityMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -223,13 +292,31 @@ export default function ActivitiesCard({ activities, isLoading, userRole, classN
         ) : (
           activities.length > 0 ? (
             activities.slice(0, 5).map(activity => (
-              <div key={activity.id} className={`border-l-4 pl-3 py-1 ${getStatusBorderColor(activity.status)}`}>
+              <div key={activity.id} className={`border-l-4 pl-3 py-2 ${getStatusBorderColor(activity.status)}`}>
                 <div className="flex justify-between items-start">
                   <div>
-                    <h3 className="font-medium text-neutral-400">{activity.title}</h3>
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-medium text-neutral-400">{activity.title}</h3>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <Badge variant="outline" className="flex items-center gap-1 text-xs">
+                              <Star className="h-3 w-3 text-yellow-500" fill="currentColor" />
+                              {activity.points || 10}
+                            </Badge>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Pontos de gamificação</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
                     <p className="text-xs text-neutral-300 mt-1">
                       {getBrokerName(activity.assignedTo)} • {translateActivityStatus(activity.status)}
                     </p>
+                    <Badge variant="secondary" className="mt-2 text-xs">
+                      {getCategoryName(activity.category || 'tarefa')}
+                    </Badge>
                   </div>
                   <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(activity.status)}`}>
                     {formatDate(activity.createdAt)}
@@ -254,7 +341,6 @@ export default function ActivitiesCard({ activities, isLoading, userRole, classN
   );
 }
 
-// Helper function to get the broker name - in a real app, would be fetched from the API
 function getBrokerName(brokerId: number): string {
   const brokers: Record<number, string> = {
     2: "Ana Rodrigues",
@@ -263,19 +349,31 @@ function getBrokerName(brokerId: number): string {
     5: "Roberto Costa",
     6: "Lucia Pereira"
   };
-  return brokers[brokerId] || "Corretor Desconhecido";
+  
+  return brokers[brokerId] || "Corretor desconhecido";
 }
 
-// Helper function to get the border color based on status
 function getStatusBorderColor(status: string): string {
   switch (status) {
     case "completed":
-      return "border-secondary";
+      return "border-green-500";
     case "in_progress":
-      return "border-primary";
+      return "border-blue-500";
     case "pending":
-      return "border-neutral-200";
     default:
-      return "border-neutral-200";
+      return "border-gray-300";
   }
+}
+
+function getCategoryName(categoryId: string): string {
+  const categories: Record<string, string> = {
+    "tarefa": "Tarefa",
+    "captacao": "Captação",
+    "visita": "Visita",
+    "negociacao": "Negociação",
+    "fechamento": "Fechamento",
+    "pos_venda": "Pós-Venda"
+  };
+  
+  return categories[categoryId] || "Tarefa";
 }

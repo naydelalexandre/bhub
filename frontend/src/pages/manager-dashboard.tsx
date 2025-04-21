@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from "wouter";
 import { useAuth } from '../contexts/AuthContext';
-import Spinner from '../components/Spinner';
+import { Spinner } from '../components/ui/spinner';
+import MobileNavigation from '../components/layouts/mobile-navigation';
 
 export default function ManagerDashboard() {
   const { user, isLoading } = useAuth();
@@ -40,7 +41,7 @@ export default function ManagerDashboard() {
         </div>
       </header>
       
-      <main className="container mx-auto px-4 py-6">
+      <main className="container mx-auto px-4 py-6 pb-16">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           {/* Card de Estatísticas 1 */}
           <div className="bg-white p-6 rounded-lg shadow-sm">
@@ -101,6 +102,8 @@ export default function ManagerDashboard() {
           </div>
         </div>
       </main>
+      
+      <MobileNavigation />
     </div>
   );
 }

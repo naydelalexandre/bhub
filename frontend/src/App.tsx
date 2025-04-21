@@ -81,6 +81,25 @@ function App() {
             </ProtectedRoute>
           </Route>
           
+          {/* Páginas de atividades, negociações e chat */}
+          <Route path="/activities">
+            <ProtectedRoute>
+              <UserModuleRedirect />
+            </ProtectedRoute>
+          </Route>
+          
+          <Route path="/negotiations">
+            <ProtectedRoute>
+              <UserModuleRedirect />
+            </ProtectedRoute>
+          </Route>
+          
+          <Route path="/chat">
+            <ProtectedRoute>
+              <UserModuleRedirect />
+            </ProtectedRoute>
+          </Route>
+          
           {/* Redirecionamento para o dashboard apropriado */}
           <Route path="/">
             <DashboardRedirect />
@@ -122,6 +141,39 @@ function DashboardRedirect() {
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+    </div>
+  )
+}
+
+// Componente para redirecionar para o módulo específico do usuário
+function UserModuleRedirect() {
+  const { user, isLoading } = useAuth()
+  
+  React.useEffect(() => {
+    if (isLoading) return
+    
+    if (!user) {
+      window.location.href = '/auth'
+      return
+    }
+    
+    const redirectPath = {
+      director: "/director",
+      manager: "/manager",
+      broker: "/broker"
+    }[user.role]
+    
+    if (redirectPath) {
+      window.location.href = redirectPath
+    }
+  }, [user, isLoading])
+  
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center gap-4">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-blue-600 border-t-transparent"></div>
+        <p className="text-gray-500">Redirecionando para sua área...</p>
+      </div>
     </div>
   )
 }
