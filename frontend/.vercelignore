@@ -1,0 +1,15 @@
+node_modules
+src
+public
+*.log
+.git
+.github
+vite.config.ts
+tsconfig.json
+README.md
+.env*
+*.lock
+mock-api
+.gitignore
+DEPLOY.md
+INICIAR-WINDOWS.md 

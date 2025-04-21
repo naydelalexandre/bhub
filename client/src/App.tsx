@@ -1,69 +1,40 @@
-import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { GamificationProvider } from "@/contexts/GamificationContext";
-import { Loader2 } from "lucide-react";
-import AppRoutes from "@/lib/routes";
-import { useState, useEffect } from "react";
-import { useAuth } from "@/contexts/AuthContext";
+import React from 'react'
 
-// Cliente de Query para o React Query
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      retry: 1,
-    },
-  },
-});
-
-// Main App component that sets up providers and basic structure
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
-    </QueryClientProvider>
-  );
-}
-
-// App content that uses authentication context
-function AppContent() {
-  const { isAuthenticated, isLoading } = useAuth();
-  const [isInitializing, setIsInitializing] = useState(true);
-  
-  // Após verificar o status de autenticação, inicialize o provider de gamificação
-  useEffect(() => {
-    if (!isLoading) {
-      // Terminamos de inicializar quando o status de autenticação é conhecido
-      setIsInitializing(false);
-    }
-  }, [isLoading]);
-  
-  // Tela de carregamento durante a inicialização
-  if (isInitializing) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center bg-background">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2 text-xl font-medium">Carregando...</span>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-blue-600">BrokerBooster</h1>
+          <p className="mt-2 text-gray-600">Sistema de Gamificação para Corretores Imobiliários</p>
+        </div>
+        
+        <div className="space-y-4">
+          <p className="text-gray-700">
+            Bem-vindo ao BrokerBooster, sua plataforma de gerenciamento imobiliário com recursos
+            avançados de gamificação para aumentar o engajamento e produtividade da sua equipe.
+          </p>
+          
+          <div className="border-t border-gray-200 pt-4">
+            <h2 className="text-xl font-semibold text-gray-800">Principais Recursos:</h2>
+            <ul className="mt-2 space-y-2 list-disc list-inside text-gray-700">
+              <li>Dashboard personalizado</li>
+              <li>Sistema de pontos e conquistas</li>
+              <li>Ranking semanal</li>
+              <li>Gerenciamento de atividades</li>
+              <li>Controle de negociações</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div className="pt-4 text-center">
+          <p className="text-sm text-gray-500">
+            © {new Date().getFullYear()} BrokerBooster - Todos os direitos reservados
+          </p>
+        </div>
       </div>
-    );
-  }
-  
-  return (
-    <TooltipProvider>
-      <Toaster />
-      {isAuthenticated ? (
-        <GamificationProvider>
-          <AppRoutes />
-        </GamificationProvider>
-      ) : (
-        <AppRoutes />
-      )}
-    </TooltipProvider>
-  );
+    </div>
+  )
 }
 
-export default App;
+export default App

@@ -84,24 +84,24 @@
     <h1>BrokerBooster - Sistema de Gamificação</h1>
     
     <div class="card">
-        <p>O sistema de gamificação foi implementado com sucesso no BrokerBooster! Esta página demonstra as funcionalidades e rotas implementadas para o sistema de gamificação.</p>
+        <p>Seja bem-vindo ao sistema de gamificação do BrokerBooster! Esta página apresenta as funcionalidades e recursos disponíveis para aumentar o engajamento e desempenho da sua equipe imobiliária.</p>
     </div>
     
-    <h2>Funcionalidades Principais</h2>
+    <h2>Recursos Principais</h2>
     
     <div class="feature">
         <div class="feature-icon">🏆</div>
         <div class="feature-content">
             <h3>Sistema de Pontos e Níveis</h3>
-            <p>Os usuários ganham pontos por suas atividades no sistema e sobem de nível conforme acumulam pontos:</p>
+            <p>Os usuários acumulam pontos por suas atividades e evoluem através de níveis cada vez mais prestigiosos:</p>
             <p>
                 <span class="level bronze">Bronze</span>
-                <span class="level silver">Silver</span>
-                <span class="level gold">Gold</span>
-                <span class="level platinum">Platinum</span>
-                <span class="level diamond">Diamond</span>
+                <span class="level silver">Prata</span>
+                <span class="level gold">Ouro</span>
+                <span class="level platinum">Platina</span>
+                <span class="level diamond">Diamante</span>
             </p>
-            <p>Cada nível exige uma quantidade específica de pontos para ser alcançado.</p>
+            <p>Cada nível representa uma evolução na carreira e traz novos benefícios e reconhecimento.</p>
         </div>
     </div>
     
@@ -109,114 +109,115 @@
         <div class="feature-icon">🎯</div>
         <div class="feature-content">
             <h3>Conquistas</h3>
-            <p>Os usuários podem desbloquear conquistas realizando ações específicas:</p>
+            <p>Desbloqueie conquistas através de ações específicas no seu dia a dia:</p>
             <ul>
-                <li>Completar atividades</li>
-                <li>Progredir negociações</li>
-                <li>Enviar mensagens</li>
-                <li>Manter uma sequência de login</li>
-                <li>E muito mais!</li>
+                <li>Registro e conclusão de atividades comerciais</li>
+                <li>Avanços nas etapas de negociação</li>
+                <li>Comunicação eficiente com clientes</li>
+                <li>Constância nas atividades diárias</li>
+                <li>Marcos de vendas e metas atingidas</li>
             </ul>
-            <p>Cada conquista concede pontos de recompensa ao ser completada.</p>
+            <p>Cada conquista concede pontos e reconhecimento pela sua dedicação.</p>
         </div>
     </div>
     
     <div class="feature">
         <div class="feature-icon">📊</div>
         <div class="feature-content">
-            <h3>Rankings e Competição</h3>
-            <p>O sistema exibe rankings semanais para estimular a competição saudável:</p>
+            <h3>Ranking Semanal</h3>
+            <p>Acompanhe seu desempenho e o de seus colegas através dos rankings semanais:</p>
             <ul>
-                <li>Ranking geral (visível para diretores)</li>
-                <li>Ranking por equipe (visível para gerentes e membros da equipe)</li>
-                <li>Ranking por tipo de usuário (corretores vs. gerentes)</li>
+                <li>Ranking geral da empresa (visível para diretores)</li>
+                <li>Ranking da sua equipe (visível para gerentes e membros)</li>
+                <li>Rankings por função (comparativo entre gerentes ou corretores)</li>
             </ul>
+            <p>Os rankings são renovados semanalmente, dando oportunidades para todos se destacarem.</p>
         </div>
     </div>
     
-    <h2>Rotas Implementadas</h2>
+    <h2>Funcionalidades Disponíveis</h2>
     
     <div class="card">
-        <p>Foram implementadas as seguintes rotas para o sistema de gamificação:</p>
+        <p>As seguintes funções estão disponíveis no sistema de gamificação:</p>
         
         <div class="route">GET /api/gamification/profile</div>
-        <p>Obtém o perfil de gamificação do usuário autenticado, incluindo nível, pontos e progresso.</p>
+        <p>Visualize seu perfil de gamificação completo, incluindo seu nível atual, pontos acumulados e progresso para o próximo nível.</p>
         <div class="role-access">
-            <span class="role">Acesso:</span> Todos os usuários autenticados podem ver seu próprio perfil.
+            <span class="role">Acesso:</span> Disponível para todos os usuários autenticados.
         </div>
         
         <div class="route">GET /api/gamification/points-history</div>
-        <p>Retorna o histórico de pontos do usuário, mostrando quando e por quais ações os pontos foram ganhos.</p>
+        <p>Consulte o histórico detalhado de como você ganhou seus pontos, com datas e ações específicas.</p>
         <div class="role-access">
-            <span class="role">Acesso:</span> Todos os usuários autenticados podem ver seu próprio histórico.
+            <span class="role">Acesso:</span> Cada usuário pode ver apenas seu próprio histórico.
         </div>
         
         <div class="route">GET /api/gamification/achievements</div>
-        <p>Lista todas as conquistas disponíveis com o progresso do usuário em cada uma.</p>
+        <p>Explore todas as conquistas disponíveis e acompanhe seu progresso em cada uma delas.</p>
         <div class="role-access">
-            <span class="role">Acesso:</span> Todos os usuários autenticados.
+            <span class="role">Acesso:</span> Disponível para todos os usuários autenticados.
         </div>
         
         <div class="route">GET /api/gamification/weekly-ranking</div>
-        <p>Exibe o ranking semanal de pontos, filtrado de acordo com o nível de acesso do usuário.</p>
+        <p>Confira o ranking semanal e sua posição em relação aos demais participantes.</p>
         <div class="role-access">
-            <span class="role">Acesso:</span> Diretores veem o ranking global, gerentes veem o ranking de sua equipe, corretores veem apenas o ranking de sua equipe.
+            <span class="role">Acesso:</span> Diretores visualizam o ranking completo da empresa, gerentes veem o ranking de sua equipe, e corretores veem o ranking de sua equipe.
         </div>
         
         <div class="route">GET /api/gamification/company-summary</div>
-        <p>Fornece um resumo completo dos dados de gamificação da empresa, incluindo estatísticas por nível, conquistas e pontos.</p>
+        <p>Análise completa do desempenho da empresa no sistema de gamificação, com estatísticas detalhadas por nível, conquistas e pontuação.</p>
         <div class="role-access">
-            <span class="role">Acesso:</span> Apenas diretores.
+            <span class="role">Acesso:</span> Exclusivo para diretores.
         </div>
         
         <div class="route">GET /api/gamification/role-ranking?role=broker|manager</div>
-        <p>Retorna o ranking de usuários por tipo específico (gerentes ou corretores).</p>
+        <p>Visualize rankings separados por função, permitindo comparar desempenho entre gerentes ou entre corretores.</p>
         <div class="role-access">
-            <span class="role">Acesso:</span> Diretores podem ver todos, gerentes podem ver apenas os corretores que gerenciam.
+            <span class="role">Acesso:</span> Diretores podem ver todos os rankings, gerentes podem ver apenas os corretores de suas equipes.
         </div>
         
         <div class="route">GET /api/gamification/team-summary/:teamId</div>
-        <p>Mostra um resumo detalhado da gamificação para uma equipe específica.</p>
+        <p>Análise detalhada do desempenho de uma equipe específica no sistema de gamificação.</p>
         <div class="role-access">
-            <span class="role">Acesso:</span> Diretores podem ver todas as equipes, gerentes podem ver apenas suas equipes, corretores podem ver apenas a equipe a que pertencem.
+            <span class="role">Acesso:</span> Diretores podem ver todas as equipes, gerentes apenas suas equipes, e corretores apenas a equipe à qual pertencem.
         </div>
         
         <div class="route">POST /api/gamification/test/add-points</div>
-        <p>Rota de teste para adicionar pontos manualmente a um usuário.</p>
+        <p>Função para testes que permite adicionar pontos manualmente (apenas em ambiente de desenvolvimento).</p>
         <div class="role-access">
-            <span class="role">Acesso:</span> Apenas para testes, disponível para todos os usuários autenticados.
+            <span class="role">Acesso:</span> Disponível apenas para testes em ambiente controlado.
         </div>
     </div>
     
-    <h2>Interfaces de Usuário</h2>
+    <h2>Componentes da Interface</h2>
     
     <div class="card">
-        <p>Foram criados os seguintes componentes para a interface de usuário:</p>
+        <p>Os seguintes componentes foram desenvolvidos para uma experiência visual rica:</p>
         <ul>
-            <li><strong>GamificationStatsCard</strong> - Exibe estatísticas de distribuição por níveis</li>
-            <li><strong>TeamRankingChart</strong> - Mostra comparação entre equipes</li>
-            <li><strong>RoleComparisonChart</strong> - Compara estatísticas entre gerentes e corretores</li>
-            <li><strong>GamificationLeaderboard</strong> - Exibe o ranking de usuários com detalhes</li>
+            <li><strong>Painel de Estatísticas</strong> - Visualização da distribuição de usuários por níveis</li>
+            <li><strong>Gráfico de Equipes</strong> - Comparação visual entre o desempenho das equipes</li>
+            <li><strong>Comparativo por Função</strong> - Análise estatística entre gerentes e corretores</li>
+            <li><strong>Quadro de Líderes</strong> - Visualização detalhada do ranking de usuários</li>
         </ul>
-        <p>O dashboard do diretor foi implementado com visualizações detalhadas de todas essas estatísticas.</p>
+        <p>O painel administrativo oferece visualizações completas de todas essas estatísticas para melhor gestão da equipe.</p>
     </div>
     
     <h2>Integração com o Sistema</h2>
     
     <div class="card">
-        <p>O sistema de gamificação está integrado com as funcionalidades existentes:</p>
+        <p>O sistema de gamificação está totalmente integrado com suas atividades diárias:</p>
         <ul>
-            <li>Pontos são concedidos automaticamente quando atividades são completadas</li>
-            <li>Negociações que progridem de estágio geram pontos</li>
-            <li>Envio de mensagens e interações no sistema são recompensados</li>
-            <li>O progresso nas conquistas é atualizado automaticamente</li>
-            <li>Notificações são enviadas quando conquistas são desbloqueadas</li>
+            <li>Ganhe pontos automaticamente ao concluir atividades comerciais</li>
+            <li>Receba bonificações quando suas negociações avançam de estágio</li>
+            <li>Seja recompensado por manter comunicação ativa com clientes</li>
+            <li>Acompanhe seu progresso nas conquistas em tempo real</li>
+            <li>Receba notificações instantâneas quando desbloquear novas conquistas</li>
         </ul>
     </div>
     
     <div class="card">
-        <p>Para acessar a aplicação completa, seria necessário iniciar o servidor com <code>npm run dev</code>, mas devido a restrições de segurança no PowerShell, não é possível executar esse comando diretamente.</p>
-        <p>Esta página demonstrativa serve como um resumo das funcionalidades implementadas no sistema de gamificação.</p>
+        <p>Para acessar a aplicação completa, utilize o atalho fornecido na área de trabalho ou inicie o servidor com o comando apropriado.</p>
+        <p>Esta página demonstrativa apresenta um resumo das funcionalidades do sistema de gamificação que irão transformar sua experiência como corretor imobiliário.</p>
     </div>
 </body>
 </html> 

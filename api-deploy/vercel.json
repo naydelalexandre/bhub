@@ -1,0 +1,20 @@
+{
+  "version": 2,
+  "buildCommand": "echo Skipping build...",
+  "functions": {
+    "api/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "routes": [
+    { "src": "/api/status", "dest": "/api/status.js" },
+    { "src": "/api/info", "dest": "/api/info.js" }, 
+    { "src": "/api/supabase", "dest": "/api/supabase.js" },
+    { "src": "/api", "dest": "/api/index.js" },
+    { "src": "/(.*)", "dest": "/api/index.js" }
+  ],
+  "env": {
+    "SUPABASE_URL": "https://mnnzzppfhjnjawrykpgj.supabase.co",
+    "SUPABASE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ubnp6cHBmaGpuamF3cnlrcGdqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDUxODQyNjIsImV4cCI6MjA2MDc2MDI2Mn0.8k2GbD_iNPy95M58mA2r41BXJEJA_uAI9-S78co_oBc"
+  }
+}

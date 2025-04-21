@@ -1,0 +1,10 @@
+{
+  "/auth/login": "/auth/login",
+  "/auth/register": "/auth/register",
+  "/notifications": "/notifications",
+  "/status": "/status",
+  "/broker-api/*": "/deals?brokerId=:splat",
+  "/manager-api/*": "/deals",
+  "/director-api/*": "/deals",
+  "/test-supabase": "/status"
+} 

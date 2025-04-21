@@ -1,0 +1,138 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Diretor Demo",
+      "email": "diretor@exemplo.com",
+      "role": "director",
+      "password": "senha123",
+      "avatarInitials": "DD"
+    },
+    {
+      "id": 2,
+      "name": "Gerente Demo",
+      "email": "gerente@exemplo.com",
+      "role": "manager",
+      "password": "senha123",
+      "avatarInitials": "GD"
+    },
+    {
+      "id": 3,
+      "name": "Corretor Demo",
+      "email": "corretor@exemplo.com",
+      "role": "broker",
+      "password": "senha123",
+      "avatarInitials": "CD"
+    }
+  ],
+  "auth": {
+    "login": {
+      "token": "jwt-token-mock-12345"
+    }
+  },
+  "notifications": [
+    {
+      "id": 1,
+      "userId": 1,
+      "message": "Novo relatório disponível",
+      "read": false,
+      "createdAt": "2023-09-01T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "userId": 2,
+      "message": "Reunião agendada para amanhã",
+      "read": true,
+      "createdAt": "2023-09-02T14:30:00Z"
+    },
+    {
+      "id": 3,
+      "userId": 3,
+      "message": "Você recebeu 100 pontos de gamificação",
+      "read": false,
+      "createdAt": "2023-09-03T09:15:00Z"
+    }
+  ],
+  "deals": [
+    {
+      "id": 1,
+      "brokerId": 3,
+      "propertyId": 101,
+      "clientName": "João Silva",
+      "value": 350000,
+      "commission": 10500,
+      "status": "completed",
+      "date": "2023-08-15T16:00:00Z"
+    },
+    {
+      "id": 2,
+      "brokerId": 3,
+      "propertyId": 102,
+      "clientName": "Maria Oliveira",
+      "value": 420000,
+      "commission": 12600,
+      "status": "in_progress",
+      "date": "2023-09-01T14:00:00Z"
+    }
+  ],
+  "properties": [
+    {
+      "id": 101,
+      "address": "Rua das Flores, 123",
+      "type": "Apartamento",
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "area": 85,
+      "price": 350000,
+      "status": "sold"
+    },
+    {
+      "id": 102,
+      "address": "Av. Principal, 789",
+      "type": "Casa",
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "area": 120,
+      "price": 420000,
+      "status": "available"
+    }
+  ],
+  "gamification": {
+    "levels": [
+      {
+        "id": 1,
+        "name": "Iniciante",
+        "minPoints": 0,
+        "maxPoints": 500,
+        "benefits": "Acesso básico ao sistema"
+      },
+      {
+        "id": 2,
+        "name": "Experiente",
+        "minPoints": 501,
+        "maxPoints": 1000,
+        "benefits": "Acesso a treinamentos exclusivos"
+      },
+      {
+        "id": 3,
+        "name": "Especialista",
+        "minPoints": 1001,
+        "maxPoints": 2000,
+        "benefits": "Comissão aumentada em 1%"
+      }
+    ],
+    "userScores": [
+      {
+        "userId": 3,
+        "points": 820,
+        "level": 2,
+        "badges": ["vendedor_mes", "cliente_satisfeito"]
+      }
+    ]
+  },
+  "status": {
+    "status": "online",
+    "version": "1.0.0",
+    "serverTime": "2023-09-05T12:00:00Z"
+  }
+} 

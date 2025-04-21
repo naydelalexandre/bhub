@@ -16,6 +16,14 @@ import { Loader2, MessageCircle, MessageSquare, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 import { convertPerformancesToPerformerProps } from "@/components/dashboard/performance-converter";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Link } from "wouter";
+import { Spinner } from "@/components/ui/spinner";
+import { EmptyState } from "@/components/ui/empty-state";
+import { AgentCard } from "@/components/dashboard/agent-card";
+import { TeamActivitiesCard } from "@/components/dashboard/team-activities-card";
+import { RankingItem } from "@/components/dashboard/ranking-item";
+import { MobileNavigation } from "@/components/layouts/mobile-navigation";
 
 export default function ManagerDashboard() {
   const { user, isLoading } = useAuth();
@@ -69,7 +77,7 @@ export default function ManagerDashboard() {
   const activeDeals = deals?.length || 0;
   const conversionRate = activeDeals > 0 ? Math.floor((activeDeals / (activeDeals + 5)) * 100) : 0;
   const averagePerformance = performances && performances.length > 0
-    ? Math.floor(performances.reduce((sum, p) => sum + p.score, 0) / performances.length)
+    ? Math.floor(performances.reduce((sum, p) => sum + p.score, 0) / performances.length) 
     : 0;
   const weeklyGrowth = "+3.2%"; // Em um app real, isso seria calculado com base em dados históricos
 
@@ -78,139 +86,174 @@ export default function ManagerDashboard() {
 
   return (
     <WebSocketProvider userId={user.id}>
-      <div className="min-h-screen bg-neutral-50 pb-16 md:pb-0 relative">
+      <div className="min-h-screen bg-neutral-50">
         <DashboardHeader 
           title="Painel do Gerente" 
           user={{
             name: user.name,
-            initials: user.avatarInitials || "MG",
+            initials: user.avatarInitials || "BM",
             role: "manager"
           }}
           notificationCount={notifications?.filter(n => !n.read).length || 0}
         />
         
-        <main className="container mx-auto px-4 py-6">
+        <main className="container mx-auto px-4 py-6 pb-16 md:pb-6">
           {/* Cards de Estatísticas */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <StatCard 
-              title="Atividades Pendentes"
-              value={pendingActivities}
-              icon="assignment"
-              iconColor="text-accent"
-              progress={{ 
-                current: pendingActivities, 
-                total: totalActivities || 1,
-                color: "bg-accent" 
-              }}
-              isLoading={isActivitiesLoading}
-            />
-            
-            <StatCard 
-              title="Negociações Ativas"
-              value={activeDeals}
-              icon="handshake"
+              title="Equipe Ativa"
+              value={teamMetrics?.activeAgents || 0}
+              suffix={` de ${teamMetrics?.totalAgents || 0}`}
+              icon="groups"
               iconColor="text-primary"
               progress={{ 
-                current: conversionRate, 
-                total: 100,
-                color: "bg-primary",
-                label: "Taxa de Conversão"
+                current: teamMetrics?.activeAgents || 0, 
+                total: teamMetrics?.totalAgents || 1,
+                color: "bg-primary"
               }}
-              isLoading={isDealsLoading}
+              isLoading={isTeamMetricsLoading}
             />
             
             <StatCard 
-              title="Desempenho Médio"
-              value={averagePerformance}
+              title="Taxa de Produtividade"
+              value={teamMetrics?.productivityRate || 0}
+              suffix="%"
+              icon="productivity"
+              iconColor="text-accent"
+              progress={{ 
+                current: teamMetrics?.productivityRate || 0, 
+                total: 100,
+                color: "bg-accent"
+              }}
+              isLoading={isTeamMetricsLoading}
+            />
+            
+            <StatCard 
+              title="Desempenho da Equipe"
+              value={teamMetrics?.performance || 0}
               suffix="/100"
               icon="leaderboard"
               iconColor="text-secondary"
               progress={{ 
-                current: averagePerformance, 
+                current: teamMetrics?.performance || 0, 
                 total: 100,
-                color: "bg-secondary",
-                label: "Crescimento Semanal",
-                trend: weeklyGrowth,
-                trendColor: "text-secondary"
+                color: "bg-secondary"
               }}
-              isLoading={isPerformancesLoading}
+              isLoading={isTeamMetricsLoading}
             />
           </div>
           
-          {/* Gráfico de Desempenho Avançado */}
+          {/* Gráfico de Desempenho */}
           <div className="mb-6">
-            <EnhancedPerformanceChart 
-              activities={activities || []}
-              deals={deals || []}
-              performances={performances || []}
-              isLoading={isActivitiesLoading || isDealsLoading || isPerformancesLoading}
-            />
+            <Card>
+              <CardHeader>
+                <CardTitle>Desempenho da Equipe</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isTeamChartLoading ? (
+                  <div className="flex justify-center items-center h-64">
+                    <Spinner size="lg" />
+                  </div>
+                ) : (
+                  <div className="h-64">
+                    <TeamPerformanceChart data={teamChartData || []} />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
-              {/* Card de Desempenho */}
-              <PerformanceCard 
-                performances={performersProps}
-                isLoading={isPerformancesLoading} 
-                className="mb-6"
-              />
+              {/* Lista de Corretores */}
+              <Card className="mb-6">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle>Corretores</CardTitle>
+                  <Button variant="text" size="sm" as={Link} to="/team">
+                    Ver todos <Icon name="arrow_forward" className="ml-1" />
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  {isAgentsLoading ? (
+                    <div className="flex justify-center my-8">
+                      <Spinner />
+                    </div>
+                  ) : agents && agents.length > 0 ? (
+                    <div className="space-y-4">
+                      {agents.slice(0, 5).map((agent) => (
+                        <AgentCard 
+                          key={agent.id}
+                          agent={agent}
+                          onChatClick={() => {/* Implementar função de chat */}}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <EmptyState
+                      icon="person_off"
+                      title="Nenhum corretor encontrado"
+                      description="Não há corretores cadastrados na sua equipe."
+                      action={{
+                        label: "Adicionar corretor",
+                        onClick: () => {/* Implementar função */}
+                      }}
+                    />
+                  )}
+                </CardContent>
+              </Card>
               
-              {/* Card de Negociações */}
-              <NegotiationsCard 
-                deals={deals || []}
-                isLoading={isDealsLoading}
-                userRole="manager"
+              {/* Atividades da Equipe */}
+              <TeamActivitiesCard 
+                activities={teamActivities || []}
+                isLoading={isTeamActivitiesLoading}
               />
             </div>
             
             <div>
-              {/* Card de Atividades */}
-              <ActivitiesCard 
-                activities={activities || []}
-                isLoading={isActivitiesLoading}
-                userRole="manager"
-                className="mb-6"
-              />
-              
-              {/* Card de Notificações */}
+              {/* Notificações */}
               <NotificationsCard 
                 notifications={notifications || []}
                 isLoading={isNotificationsLoading}
+                className="mb-6"
               />
+              
+              {/* Ranking da Equipe */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Ranking de Desempenho</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {isTeamRankingLoading ? (
+                    <div className="flex justify-center my-8">
+                      <Spinner />
+                    </div>
+                  ) : teamRanking && teamRanking.length > 0 ? (
+                    <div className="space-y-3">
+                      {teamRanking.map((agent, index) => (
+                        <RankingItem 
+                          key={agent.id}
+                          position={index + 1}
+                          name={agent.name}
+                          score={agent.score}
+                          avatarUrl={agent.avatar}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <EmptyState
+                      icon="leaderboard"
+                      title="Sem dados de ranking"
+                      description="O ranking será atualizado conforme a equipe registrar atividades."
+                      size="sm"
+                    />
+                  )}
+                </CardContent>
+              </Card>
             </div>
           </div>
         </main>
         
-        {/* Botão de Chat Mobile */}
-        <div className="md:hidden fixed bottom-4 right-4 z-10">
-          <Button 
-            onClick={() => setChatOpen(true)}
-            className="h-14 w-14 rounded-full bg-primary shadow-lg flex justify-center items-center"
-          >
-            <MessageCircle className="h-6 w-6 text-white" />
-          </Button>
-        </div>
-        
-        {/* Drawer de Chat Mobile */}
-        <Drawer open={chatOpen} onOpenChange={setChatOpen}>
-          <DrawerContent className="h-[90vh]">
-            <div className="h-full p-4">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-lg font-semibold">Chat da Equipe</h2>
-                <Button variant="ghost" size="icon" onClick={() => setChatOpen(false)}>
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
-              <TeamChat currentUser={user} className="h-[calc(100%-50px)]" />
-            </div>
-          </DrawerContent>
-        </Drawer>
-        
-        {/* Chat para Desktop */}
-        <div className="hidden md:block fixed right-4 bottom-4 w-[350px] h-[500px] shadow-xl rounded-lg overflow-hidden border border-neutral-200 z-10">
-          <TeamChat currentUser={user} />
-        </div>
+        <MobileNavigation />
       </div>
     </WebSocketProvider>
   );

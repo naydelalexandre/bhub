@@ -13,6 +13,12 @@ import TeamRankingChart from '../components/gamification/team-ranking-chart';
 import GamificationStatsCard from '../components/gamification/gamification-stats-card';
 import RoleComparisonChart from '../components/gamification/role-comparison-chart';
 import GamificationLeaderboard from '../components/gamification/gamification-leaderboard';
+import { WebSocketProvider } from '../contexts/WebSocketContext';
+import { Link } from 'react-router-dom';
+import { Icon } from '@mui/material';
+import Spinner from '../components/Spinner';
+import EmptyState from '../components/EmptyState';
+import MobileNavigation from '../components/MobileNavigation';
 
 const StyledTab = styled(Tab)({
   textTransform: 'none',
@@ -122,190 +128,199 @@ export default function DirectorDashboard() {
   }
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <DashboardHeader />
-      <Container maxWidth="lg" sx={{ mt: 4, mb: 4, flexGrow: 1 }}>
-        <Box sx={{ mb: 3 }}>
-          <Typography variant="h4" fontWeight="bold" gutterBottom>
-            Visão da Diretoria: Gamificação
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            Acompanhe o desempenho global e por equipe no sistema de gamificação
-          </Typography>
-        </Box>
-
-        <Tabs 
-          value={activeTab} 
-          onChange={handleTabChange} 
-          variant="scrollable" 
-          scrollButtons="auto"
-        >
-          <StyledTab label="Visão Geral" />
-          <StyledTab label="Comparação de Equipes" />
-          <StyledTab label="Ranking de Corretores" />
-          <StyledTab label="Ranking de Gerentes" />
-        </Tabs>
-
-        {/* Visão Geral */}
-        <TabPanel value={activeTab} index={0}>
-          {companyStats && (
-            <Grid container spacing={3}>
-              <Grid item xs={12} md={6} lg={3}>
-                <StatCard 
-                  title="Total de Usuários"
-                  value={companyStats.totalUsers}
-                  icon="people"
-                  color="#2196f3"
-                />
-              </Grid>
-              <Grid item xs={12} md={6} lg={3}>
-                <StatCard 
-                  title="Pontos Semanais"
-                  value={companyStats.points.weeklyTotal}
-                  icon="star"
-                  color="#ff9800"
-                />
-              </Grid>
-              <Grid item xs={12} md={6} lg={3}>
-                <StatCard 
-                  title="Média de Pontos"
-                  value={companyStats.points.average}
-                  icon="equalizer"
-                  color="#4caf50"
-                />
-              </Grid>
-              <Grid item xs={12} md={6} lg={3}>
-                <StatCard 
-                  title="Taxa de Conquistas"
-                  value={`${companyStats.achievements.completionRate}%`}
-                  icon="emoji_events"
-                  color="#e91e63"
-                />
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <GamificationStatsCard 
-                  title="Distribuição por Nível"
-                  stats={companyStats.levelDistribution}
-                  levels={["bronze", "silver", "gold", "platinum", "diamond"]}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={6}>
-                <Card sx={{ height: '100%' }}>
-                  <CardContent>
-                    <Typography variant="h6" fontWeight="bold" gutterBottom>
-                      Estatísticas de Conquistas
-                    </Typography>
-                    <Box sx={{ mt: 2, mb: 1 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Total de Conquistas
-                      </Typography>
-                      <Typography variant="h5">
-                        {companyStats.achievements.total}
-                      </Typography>
-                    </Box>
-                    <Divider sx={{ my: 2 }} />
-                    <Box sx={{ mt: 2, mb: 1 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Conquistas Completadas
-                      </Typography>
-                      <Typography variant="h5">
-                        {companyStats.achievements.completed}
-                      </Typography>
-                    </Box>
-                    <Divider sx={{ my: 2 }} />
-                    <Box sx={{ mt: 2 }}>
-                      <Typography variant="body2" color="text.secondary">
-                        Taxa de Conclusão
-                      </Typography>
-                      <Typography variant="h5">
-                        {companyStats.achievements.completionRate}%
-                      </Typography>
-                    </Box>
-                  </CardContent>
-                </Card>
-              </Grid>
-
-              <Grid item xs={12}>
-                <RoleComparisonChart 
-                  brokers={brokerRanking}
-                  managers={managerRanking}
-                />
-              </Grid>
-            </Grid>
-          )}
-        </TabPanel>
-
-        {/* Comparação de Equipes */}
-        <TabPanel value={activeTab} index={1}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <TeamRankingChart teams={teamRanking} />
-            </Grid>
-            <Grid item xs={12}>
-              <Card>
-                <CardContent>
-                  <Typography variant="h6" fontWeight="bold" gutterBottom>
-                    Ranking de Equipes
-                  </Typography>
-                  <Box sx={{ overflowX: 'auto' }}>
-                    <Box sx={{ minWidth: 650, mt: 2 }}>
-                      <Box sx={{ display: 'flex', fontWeight: 'bold', borderBottom: '1px solid rgba(224, 224, 224, 1)', p: 1 }}>
-                        <Box sx={{ flex: '0 0 60px' }}>Rank</Box>
-                        <Box sx={{ flex: '1 1 auto' }}>Equipe</Box>
-                        <Box sx={{ flex: '0 0 120px' }}>Pontos Totais</Box>
-                        <Box sx={{ flex: '0 0 120px' }}>Média/Membro</Box>
-                        <Box sx={{ flex: '0 0 180px' }}>Top Performer</Box>
-                      </Box>
-                      {teamRanking.map((team, index) => (
-                        <Box key={team.teamId} sx={{ display: 'flex', borderBottom: '1px solid rgba(224, 224, 224, 0.5)', p: 1 }}>
-                          <Box sx={{ flex: '0 0 60px' }}>{index + 1}</Box>
-                          <Box sx={{ flex: '1 1 auto' }}>{team.teamName}</Box>
-                          <Box sx={{ flex: '0 0 120px' }}>{team.totalPoints}</Box>
-                          <Box sx={{ flex: '0 0 120px' }}>{team.averagePoints}</Box>
-                          <Box sx={{ flex: '0 0 180px' }}>{team.topPerformer?.name} ({team.topPerformer?.totalPoints})</Box>
-                        </Box>
-                      ))}
-                    </Box>
-                  </Box>
-                </CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                  <Button variant="outlined" color="primary">
-                    Ver Detalhes Completos
+    <WebSocketProvider userId={user.id}>
+      <div className="min-h-screen bg-neutral-50">
+        <DashboardHeader 
+          title="Painel do Diretor" 
+          user={{
+            name: user.name,
+            initials: user.avatarInitials || "BD",
+            role: "director"
+          }}
+          notificationCount={notifications?.filter(n => !n.read).length || 0}
+        />
+        
+        <main className="container mx-auto px-4 py-6">
+          {/* Cards de Métricas Principais */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <StatCard 
+              title="Imóveis Negociados"
+              value={companyMetrics?.propertiesSold || 0}
+              suffix={companyMetrics?.propertiesSoldTrend > 0 ? ' ↑' : (companyMetrics?.propertiesSoldTrend < 0 ? ' ↓' : '')}
+              icon="real_estate_agent"
+              iconColor="text-primary"
+              progress={{ 
+                current: companyMetrics?.propertiesSold || 0, 
+                total: companyMetrics?.propertiesTarget || 1,
+                color: "bg-primary"
+              }}
+              isLoading={isCompanyMetricsLoading}
+            />
+            
+            <StatCard 
+              title="Faturamento"
+              value={formatCurrency(companyMetrics?.revenue || 0)}
+              suffix={companyMetrics?.revenueTrend > 0 ? ' ↑' : (companyMetrics?.revenueTrend < 0 ? ' ↓' : '')}
+              icon="attach_money"
+              iconColor="text-accent"
+              progress={{ 
+                current: companyMetrics?.revenue || 0, 
+                total: companyMetrics?.revenueTarget || 1,
+                color: "bg-accent"
+              }}
+              isLoading={isCompanyMetricsLoading}
+            />
+            
+            <StatCard 
+              title="Desempenho Geral"
+              value={companyMetrics?.overallPerformance || 0}
+              suffix="/100"
+              icon="leaderboard"
+              iconColor="text-secondary"
+              progress={{ 
+                current: companyMetrics?.overallPerformance || 0, 
+                total: 100,
+                color: "bg-secondary"
+              }}
+              isLoading={isCompanyMetricsLoading}
+            />
+          </div>
+          
+          {/* Desempenho por Filial */}
+          <div className="mb-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Desempenho por Filial</CardTitle>
+              </CardHeader>
+              <CardContent>
+                {isBranchPerformanceLoading ? (
+                  <div className="flex justify-center items-center h-64">
+                    <Spinner size="lg" />
+                  </div>
+                ) : (
+                  <div className="h-64">
+                    <BranchPerformanceChart data={branchPerformance || []} />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+          
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              {/* Melhores Filiais */}
+              <Card className="mb-6">
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle>Melhores Filiais</CardTitle>
+                  <Button variant="text" size="sm" as={Link} to="/branches">
+                    Ver todas <Icon name="arrow_forward" className="ml-1" />
                   </Button>
-                </Box>
+                </CardHeader>
+                <CardContent>
+                  {isTopBranchesLoading ? (
+                    <div className="flex justify-center my-8">
+                      <Spinner />
+                    </div>
+                  ) : topBranches && topBranches.length > 0 ? (
+                    <div className="space-y-4">
+                      {topBranches.map((branch) => (
+                        <BranchCard 
+                          key={branch.id}
+                          branch={branch}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <EmptyState
+                      icon="store"
+                      title="Nenhuma filial encontrada"
+                      description="Não há filiais cadastradas no sistema."
+                      action={{
+                        label: "Adicionar filial",
+                        onClick: () => {/* Implementar função */}
+                      }}
+                    />
+                  )}
+                </CardContent>
               </Card>
-            </Grid>
-          </Grid>
-        </TabPanel>
-
-        {/* Ranking de Corretores */}
-        <TabPanel value={activeTab} index={2}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <GamificationLeaderboard 
-                title="Ranking de Corretores"
-                users={brokerRanking}
-                userType="broker"
+              
+              {/* Tendências de Mercado */}
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle>Tendências de Mercado</CardTitle>
+                  <Button variant="text" size="sm" as={Link} to="/market-trends">
+                    Ver mais <Icon name="arrow_forward" className="ml-1" />
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  {isMarketTrendsLoading ? (
+                    <div className="flex justify-center my-8">
+                      <Spinner />
+                    </div>
+                  ) : marketTrends && marketTrends.length > 0 ? (
+                    <div className="space-y-4">
+                      {marketTrends.map((trend) => (
+                        <MarketTrendCard 
+                          key={trend.id}
+                          trend={trend}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <EmptyState
+                      icon="trending_up"
+                      title="Sem dados de tendências"
+                      description="As tendências de mercado serão atualizadas conforme novos dados forem coletados."
+                      size="sm"
+                    />
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+            
+            <div>
+              {/* Notificações */}
+              <NotificationsCard 
+                notifications={notifications || []}
+                isLoading={isNotificationsLoading}
+                className="mb-6"
               />
-            </Grid>
-          </Grid>
-        </TabPanel>
-
-        {/* Ranking de Gerentes */}
-        <TabPanel value={activeTab} index={3}>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <GamificationLeaderboard 
-                title="Ranking de Gerentes"
-                users={managerRanking}
-                userType="manager"
-              />
-            </Grid>
-          </Grid>
-        </TabPanel>
-      </Container>
-    </Box>
+              
+              {/* Destaques da Semana */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Destaques da Semana</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {isHighlightsLoading ? (
+                    <div className="flex justify-center my-8">
+                      <Spinner />
+                    </div>
+                  ) : highlights && highlights.length > 0 ? (
+                    <div className="space-y-3">
+                      {highlights.map((highlight) => (
+                        <HighlightCard 
+                          key={highlight.id}
+                          highlight={highlight}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <EmptyState
+                      icon="stars"
+                      title="Sem destaques"
+                      description="Os destaques semanais serão exibidos aqui."
+                      size="sm"
+                    />
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </main>
+        
+        <MobileNavigation />
+      </div>
+    </WebSocketProvider>
   );
 } 

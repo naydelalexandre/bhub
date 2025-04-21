@@ -1,0 +1,47 @@
+<!DOCTYPE html> 
+<html lang="pt-BR"> 
+<head> 
+  <meta charset="UTF-8"> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+  <title>BrokerBooster</title> 
+  <link rel="stylesheet" href="/assets/index-CAKS8lBI.css"> 
+  <style> 
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; } 
+    #fallback { display: none; max-width: 800px; margin: 0 auto; padding: 2rem; } 
+    #root:empty + #fallback { display: block; } 
+    .header { text-align: center; margin-bottom: 2rem; } 
+    .title { color: #0066cc; font-size: 2.5rem; margin-bottom: 0.5rem; } 
+    .features { margin-top: 2rem; } 
+    .feature-list li { padding: 0.5rem 0; } 
+  </style> 
+</head> 
+<body> 
+  <div id="root"></div> 
+  <div id="fallback"> 
+    <div class="header"> 
+      <h1 class="title">BrokerBooster</h1> 
+      <p>Sistema de Gamificação para Corretores Imobiliários</p> 
+    </div> 
+    <p>Bem-vindo ao BrokerBooster, uma plataforma de gerenciamento imobiliário com recursos avançados de gamificação para aumentar o engajamento e produtividade da sua equipe.</p> 
+    <div class="features"> 
+      <h2>Principais Recursos</h2> 
+      <ul class="feature-list"> 
+        <li>Dashboard personalizado com métricas de desempenho</li> 
+        <li>Sistema de pontos e conquistas para motivar sua equipe</li> 
+        <li>Ranking semanal com líderes em vendas e captações</li> 
+        <li>Gerenciamento completo de atividades e tarefas</li> 
+      </ul> 
+    </div> 
+  </div> 
+  <script type="module" crossorigin src="/assets/index-DDdahP6I.js"></script> 
+  <script> 
+    // Verificar se o React carregou corretamente 
+    setTimeout(function() { 
+      if (document.getElementById('root').children.length === 0) { 
+        console.log('React não foi inicializado corretamente. Mostrando fallback.'); 
+        document.getElementById('fallback').style.display = 'block'; 
+      } 
+    }, 1000); 
+  </script> 
+</body> 
+</html> 

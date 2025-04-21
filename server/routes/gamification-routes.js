@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const gamificationRepo = require('../db/gamification-repository');
+// Usar o repositório Supabase em vez do SQLite
+// const gamificationRepo = require('../db/gamification-repository');
+const gamificationRepo = require('../gamification-repository-supabase');
 const { authenticateJWT } = require('../middleware/auth');
 
 // Middleware de autenticação para todas as rotas de gamificação

@@ -4,7 +4,8 @@ const morgan = require('morgan');
 const helmet = require('helmet');
 const fs = require('fs');
 const path = require('path');
-const { initializeDatabase } = require('./db/init');
+const { testSupabaseConnection } = require('./supabase');
+const gamificationRepository = require('./gamification-repository-supabase');
 const { startCronJobs } = require('./cron/gamification-jobs');
 
 // Sistema de logs estruturados
@@ -146,9 +147,13 @@ app.use((err, req, res, next) => {
 // Inicializar tudo e iniciar o servidor
 async function startServer() {
   try {
-    // Inicializar banco de dados
-    await initializeDatabase();
-    logger.info('Banco de dados inicializado com sucesso!');
+    // Testar conexão com Supabase ao invés de inicializar SQLite
+    // await initializeDatabase();
+    const connected = await testSupabaseConnection();
+    if (!connected) {
+      throw new Error('Falha ao conectar com Supabase');
+    }
+    logger.info('Conexão com Supabase estabelecida com sucesso!');
     
     // Iniciar tarefas cron da gamificação
     startCronJobs();

@@ -1,92 +1,97 @@
 @echo off
-echo ======================================================
-echo    INICIALIZAÇÃO DO SISTEMA BROKERBOOSTER
-echo ======================================================
-echo.
-echo Verificando por processos anteriores...
+TITLE Inicialização do BrokerBooster
 
-REM Verifica se há processos rodando e os termina
-taskkill /f /im python.exe /fi "WINDOWTITLE eq Demonstration Python Server" 2>NUL
-taskkill /f /im node.exe /fi "WINDOWTITLE eq Visual Examples Server" 2>NUL
-taskkill /f /im node.exe /fi "WINDOWTITLE eq B.Hub Demonstration Server" 2>NUL
-taskkill /f /im node.exe /fi "WINDOWTITLE eq B.Hub Visual Examples Server" 2>NUL
-taskkill /f /im node.exe /fi "WINDOWTITLE eq Gamification Server" 2>NUL
-taskkill /f /im node.exe /fi "WINDOWTITLE eq BrokerBooster Server" 2>NUL
-taskkill /f /im node.exe /fi "WINDOWTITLE eq BrokerBooster Client" 2>NUL
-
-echo Verificando se portas estão disponíveis...
-
-REM Verifica se portas estão sendo usadas
-netstat -ano | findstr :3001 >NUL
-if not %ERRORLEVEL% == 0 (
-    echo Porta 3001 está livre.
+REM Verifica se já existem processos rodando nas portas
+echo Verificando portas em uso...
+netstat -ano | findstr :3000 > nul
+if %errorlevel% equ 0 (
+    echo Porta 3000 em uso. Encerrando processo...
+    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3000') do (
+        taskkill /F /PID %%a
+    )
 ) else (
-    echo ATENÇÃO: Porta 3001 está em uso. Tentando liberar...
-    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3001') do taskkill /f /pid %%a 2>NUL
+    echo Porta 3000 livre.
 )
 
-netstat -ano | findstr :3003 >NUL
-if not %ERRORLEVEL% == 0 (
-    echo Porta 3003 está livre.
+netstat -ano | findstr :3001 > nul
+if %errorlevel% equ 0 (
+    echo Porta 3001 em uso. Encerrando processo...
+    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3001') do (
+        taskkill /F /PID %%a
+    )
 ) else (
-    echo ATENÇÃO: Porta 3003 está em uso. Tentando liberar...
-    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3003') do taskkill /f /pid %%a 2>NUL
+    echo Porta 3001 livre.
 )
 
-netstat -ano | findstr :3004 >NUL
-if not %ERRORLEVEL% == 0 (
-    echo Porta 3004 está livre.
+netstat -ano | findstr :3003 > nul
+if %errorlevel% equ 0 (
+    echo Porta 3003 em uso. Encerrando processo...
+    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3003') do (
+        taskkill /F /PID %%a
+    )
 ) else (
-    echo ATENÇÃO: Porta 3004 está em uso. Tentando liberar...
-    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3004') do taskkill /f /pid %%a 2>NUL
+    echo Porta 3003 livre.
 )
 
-netstat -ano | findstr :3007 >NUL
-if not %ERRORLEVEL% == 0 (
-    echo Porta 3007 está livre.
+netstat -ano | findstr :3004 > nul
+if %errorlevel% equ 0 (
+    echo Porta 3004 em uso. Encerrando processo...
+    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3004') do (
+        taskkill /F /PID %%a
+    )
 ) else (
-    echo ATENÇÃO: Porta 3007 está em uso. Tentando liberar...
-    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3007') do taskkill /f /pid %%a 2>NUL
+    echo Porta 3004 livre.
+)
+
+netstat -ano | findstr :3007 > nul
+if %errorlevel% equ 0 (
+    echo Porta 3007 em uso. Encerrando processo...
+    for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3007') do (
+        taskkill /F /PID %%a
+    )
+) else (
+    echo Porta 3007 livre.
 )
 
 echo.
 echo Iniciando servidores de demonstração...
+
+REM Iniciar o servidor Python na porta 3001
+start "Servidor Python" cmd /c "python server.py"
+
+REM Iniciar o servidor de exemplos visuais na porta 3003
+start "Exemplos Visuais" cmd /c "cd visual-examples && npm start"
+
+REM Iniciar o servidor B.Hub de demonstração na porta 3004
+start "B.Hub Demonstração" cmd /c "cd bhub && npm start"
+
+REM Iniciar o servidor de gamificação na porta 3007
+start "Gamificação" cmd /c "cd gamification && npm start"
+
+echo.
+echo Servidores de demonstração iniciados! URLs:
+echo - Demonstração Python: http://localhost:3001/demo.html
+echo - Exemplos Visuais: http://localhost:3003
+echo - B.Hub Demonstração: http://localhost:3004
+echo - B.Hub Exemplos Visuais: http://localhost:3005
+echo - Gamificação: http://localhost:3007
 echo.
 
-REM Inicia servidores de demostração em novas janelas
-start "Servidor Python - Demonstração" cmd /k "cd /d %~dp0 && python server.py"
-start "Exemplos Visuais" cmd /k "cd /d %~dp0 && node server-examples.js 3003"
-start "Demonstração B.Hub" cmd /k "cd /d %~dp0 && node server-bhub.js 3004"
-start "Exemplos Visuais B.Hub" cmd /k "cd /d %~dp0 && node server-bhub-examples.js 3005"
-start "Sistema de Gamificação" cmd /k "cd /d %~dp0 && node server-gamification.js 3007"
-
-echo.
-echo ======================================================
-echo  LINKS DE ACESSO ÀS DEMONSTRAÇÕES:
-echo ======================================================
-echo.
-echo  1. Demonstração Python: http://localhost:3001/demo.html
-echo  2. Exemplos Visuais: http://localhost:3003
-echo  3. Demonstração B.Hub: http://localhost:3004
-echo  4. Exemplos Visuais B.Hub: http://localhost:3005
-echo  5. Sistema de Gamificação: http://localhost:3007
-echo.
-echo ======================================================
+REM Iniciar os servidores principais (backend e frontend)
+echo Para iniciar o servidor principal, execute em terminais separados:
+echo cd backend && npm run dev
+echo cd frontend && npm run dev
 echo.
 
-REM O servidor principal e o cliente devem ser iniciados separadamente
-echo Para iniciar o servidor e cliente principal da aplicação,
-echo abra duas janelas de Prompt de Comando (cmd) e execute:
-echo.
-echo SERVIDOR (primeira janela CMD):
-echo   cd %~dp0\server
-echo   npm run dev
-echo.
-echo CLIENTE (segunda janela CMD):
-echo   cd %~dp0\client
-echo   npm run dev
-echo.
-echo ======================================================
+REM Estes comandos estão comentados por padrão devido às restrições do PowerShell
+REM Descomente se estiver usando CMD ou se já alterou a política de execução do PowerShell
+
+REM start "Servidor Backend" cmd /c "cd backend && npm run dev"
+REM start "Servidor Frontend" cmd /c "cd frontend && npm run dev"
+
+echo Após iniciar os servidores principais, acesse:
+echo - Backend: http://localhost:3000
+echo - Frontend: http://localhost:5173
 echo.
 
 pause 

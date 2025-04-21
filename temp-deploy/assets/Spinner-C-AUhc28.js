@@ -1,0 +1,1 @@
+import{j as e}from"./index-BS_hr4Ly.js";function a({size:s="md"}){const r={sm:"h-4 w-4",md:"h-8 w-8",lg:"h-12 w-12"}[s];return e.jsx("div",{className:`${r} animate-spin rounded-full border-4 border-gray-200 border-t-blue-600`})}export{a as S};
