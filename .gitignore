@@ -30,7 +30,7 @@ yarn-error.log*
 *.sln
 *.sw?
 
-dist
+# dist
 server/public
 vite.config.ts.*
 *.tar.gz
