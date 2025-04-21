@@ -1,5 +1,5 @@
 import React from 'react'
-import { Switch, Route } from 'wouter'
+import { Switch, Route, useLocation } from 'wouter'
 import { AuthProvider } from './contexts/AuthContext'
 
 // Importações preguiçosas para os componentes de página
@@ -21,6 +21,20 @@ function ProtectedRoute({
   role?: 'director' | 'manager' | 'broker' 
 }) {
   const { user, isLoading } = useAuth()
+  const [, setLocation] = useLocation()
+  
+  React.useEffect(() => {
+    if (isLoading) return
+    
+    if (!user) {
+      setLocation('/auth')
+      return
+    }
+    
+    if (role && user.role !== role) {
+      setLocation(`/${user.role}`)
+    }
+  }, [user, isLoading, role, setLocation])
   
   if (isLoading) {
     return (
@@ -30,14 +44,12 @@ function ProtectedRoute({
     )
   }
   
-  if (!user) {
-    window.location.href = '/auth'
-    return null
-  }
-  
-  if (role && user.role !== role) {
-    window.location.href = `/${user.role}`
-    return null
+  if (!user || (role && user.role !== role)) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
+    )
   }
   
   return <>{children}</>
@@ -118,12 +130,13 @@ function App() {
 // Componente auxiliar para redirecionar para o dashboard apropriado
 function DashboardRedirect() {
   const { user, isLoading } = useAuth()
+  const [, setLocation] = useLocation()
   
   React.useEffect(() => {
     if (isLoading) return
     
     if (!user) {
-      window.location.href = '/auth'
+      setLocation('/auth')
       return
     }
     
@@ -134,9 +147,9 @@ function DashboardRedirect() {
     }[user.role]
     
     if (redirectPath) {
-      window.location.href = redirectPath
+      setLocation(redirectPath)
     }
-  }, [user, isLoading])
+  }, [user, isLoading, setLocation])
   
   return (
     <div className="flex items-center justify-center min-h-screen">
@@ -148,12 +161,13 @@ function DashboardRedirect() {
 // Componente para redirecionar para o módulo específico do usuário
 function UserModuleRedirect() {
   const { user, isLoading } = useAuth()
+  const [, setLocation] = useLocation()
   
   React.useEffect(() => {
     if (isLoading) return
     
     if (!user) {
-      window.location.href = '/auth'
+      setLocation('/auth')
       return
     }
     
@@ -164,9 +178,9 @@ function UserModuleRedirect() {
     }[user.role]
     
     if (redirectPath) {
-      window.location.href = redirectPath
+      setLocation(redirectPath)
     }
-  }, [user, isLoading])
+  }, [user, isLoading, setLocation])
   
   return (
     <div className="flex items-center justify-center min-h-screen">
