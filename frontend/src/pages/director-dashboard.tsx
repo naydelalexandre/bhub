@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from "wouter";
 import { useAuth } from '../contexts/AuthContext';
-import Spinner from '../components/Spinner';
-import EmptyState from '../components/EmptyState';
-import MobileNavigation from '../components/MobileNavigation';
+import { Spinner } from '../components/ui/spinner';
+import { EmptyState } from '../components/ui/empty-state';
+import MobileNavigation from '../components/layouts/mobile-navigation';
+import { Button } from '../components/ui/button';
 
 export default function DirectorDashboard() {
   const { user, isLoading } = useAuth();
@@ -136,7 +137,6 @@ export default function DirectorDashboard() {
                 icon="notifications"
                 title="Nenhuma notificação"
                 description="Você não possui notificações não lidas."
-                size="sm"
               />
             </div>
           </div>
